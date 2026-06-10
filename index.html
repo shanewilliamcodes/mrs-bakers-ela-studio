@@ -63,7 +63,8 @@
 
     <section class="view" id="view-fast">
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Florida Assessment of Student Thinking</p><h1>FAST Challenge</h1><p>Short, original Grade 6 practice aligned to Florida B.E.S.T. reading skills.</p></div>
-      <div class="game-stats"><article><small>Score</small><b id="fast-score">0</b></article><article><small>Streak</small><b id="fast-streak">0</b></article><article><small>Questions</small><b id="fast-count">0</b></article><article><small>Best skill</small><b id="fast-best">Start playing</b></article></div>
+      <div class="auth-gate" id="fast-gate"><span class="lock">✓</span><h2>Sign in to start the challenge</h2><p>Your account keeps your personal best streak connected to you and updates the class Streak Spotlight automatically.</p><button id="fast-signin">Continue with Google</button><small>Sign in once, enter your class code, and start playing.</small></div>
+      <div id="fast-game" hidden><div class="game-stats"><article><small>Score</small><b id="fast-score">0</b></article><article><small>Streak</small><b id="fast-streak">0</b></article><article><small>Questions</small><b id="fast-count">0</b></article><article><small>Best skill</small><b id="fast-best">Start playing</b></article></div>
       <div class="fast-shell">
         <article class="question-card">
           <div class="question-meta"><span id="fast-category"></span><b id="fast-standard"></b><button id="fast-reset">Reset game</button></div>
@@ -75,7 +76,7 @@
         </article>
         <aside class="strategy-card"><p class="eyebrow">Use this every time</p><h2>Question → Evidence → Choice → Check</h2><ol><li><b>1</b> Name exactly what the question asks.</li><li><b>2</b> Find the sentence or detail that proves it.</li><li><b>3</b> Predict an answer before reading choices.</li><li><b>4</b> Eliminate choices the text does not fully support.</li></ol><p><b>Remember:</b> This is skill practice, not an official FAST test or score predictor.</p></aside>
       </div>
-      <section class="leaderboard"><div><p class="eyebrow">Celebrate persistence</p><h2>FAST Streak Spotlight</h2><p>Only the ten strongest personal streaks appear. Keep practicing and your new best can earn a place here.</p></div><ol id="leaderboard-list"><li class="leaderboard-empty">Sign in and play to start our class leaderboard.</li></ol><p class="leaderboard-note">Privacy: first name and last initial only. Scores and lower rankings are never shown.</p></section>
+      <section class="leaderboard"><div><p class="eyebrow">Celebrate persistence</p><h2>FAST Streak Spotlight</h2><p>Only the ten strongest personal streaks appear. Every signed-in student joins automatically.</p></div><ol id="leaderboard-list"><li class="leaderboard-empty">Sign in and play to start our class leaderboard.</li></ol><p class="leaderboard-note">Privacy: first name and last initial only. Scores and lower rankings are never shown.</p></section></div>
     </section>
 
     <section class="view" id="view-explore">
