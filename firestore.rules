@@ -18,7 +18,11 @@ service cloud.firestore {
         && request.resource.data.studentUid == request.auth.uid
         && request.resource.data.status == 'submitted';
       allow read: if signedIn() && (resource.data.studentUid == request.auth.uid || isTeacher());
-      allow update: if false;
+      // A student may edit their own same-day entry; ownership cannot change.
+      allow update: if signedIn()
+        && resource.data.studentUid == request.auth.uid
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.status == 'submitted';
       allow delete: if isTeacher();
     }
     match /leaderboard/{uid} {

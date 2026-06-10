@@ -1,0 +1,14 @@
+/* Bell work "completed today" state */
+.bell-done{max-width:900px;margin:auto;background:#fff;border:1px solid var(--line);border-radius:28px;padding:clamp(28px,5vw,48px);box-shadow:var(--shadow);text-align:center}
+.done-check{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 8px;border-radius:50%;background:#ebf7f0;color:#3c8761;font-size:1.9rem}
+.bell-done h2{font-size:clamp(1.6rem,3vw,2.2rem);margin:.2em 0}
+.bell-done>p{color:var(--muted);max-width:520px;margin:0 auto 4px;line-height:1.6}
+.done-answer{text-align:left;background:var(--blush);border-left:4px solid var(--pink);border-radius:0 14px 14px 0;padding:18px 20px;margin:24px 0}
+.done-answer small{display:block;color:var(--deep);font-weight:700;margin-bottom:8px}
+.done-answer p{margin:0;line-height:1.7;white-space:pre-wrap}
+.done-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.done-actions button{border:0;border-radius:12px;padding:14px 24px;font-weight:700;cursor:pointer}
+#done-edit{background:var(--deep);color:#fff}
+#done-home{background:var(--blush);color:var(--deep)}
+.bell-done .history{margin-top:28px;text-align:left}
+@media(max-width:560px){.done-actions button{width:100%}}

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="leaderboard.css?v=1">
   <link rel="stylesheet" href="account-fixes.css?v=1">
   <link rel="stylesheet" href="analytics.css?v=1">
+  <link rel="stylesheet" href="bellwork.css?v=1">
 </head>
 <body>
   <header class="topbar">
@@ -59,7 +60,15 @@
         <div class="bell-checklist"><label><input type="checkbox" id="check-answer"> I answered every part.</label><label><input type="checkbox" id="check-evidence"> I used a detail or example.</label><label><input type="checkbox" id="check-revise"> I reread and improved my work.</label></div>
         <div class="submit-row"><label>Confidence<select id="confidence"><option value="">Choose</option><option value="1">1 · I need help</option><option value="2">2 · Getting started</option><option value="3">3 · Mostly understand</option><option value="4">4 · I can explain it</option></select></label><button id="submit-bellwork">Submit to Mrs. Baker</button></div>
         <p id="submission-message" role="status"></p>
-        <details class="history"><summary>My submitted bell work <span id="history-count">0</span></summary><div id="bell-history-list"></div></details>
+        <details class="history"><summary>My past bell work <span class="bell-history-count">0</span></summary><div class="bell-history-list"></div></details>
+      </article>
+      <article class="bell-done" id="bellwork-done" hidden>
+        <span class="done-check">✓</span>
+        <h2>Today's bell work is complete!</h2>
+        <p>Nice work — your answer was sent to Mrs. Baker. You can come back any time today to view or edit it.</p>
+        <div class="done-answer"><small id="done-meta"></small><p id="done-response"></p></div>
+        <div class="done-actions"><button id="done-edit">Edit my answer</button><button id="done-home" data-view="home">Back to Launchpad</button></div>
+        <details class="history" open><summary>My past bell work <span class="bell-history-count">0</span></summary><div class="bell-history-list"></div></details>
       </article>
     </section>
 
@@ -107,6 +116,6 @@
   </main>
 
   <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="account-ready">Your account is ready.</p><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=3"></script>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=4"></script>
 </body>
 </html>
