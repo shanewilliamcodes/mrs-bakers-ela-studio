@@ -1,6 +1,6 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,GoogleAuthProvider,onAuthStateChanged,signInWithPopup,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {addDoc,collection,doc,getDoc,getDocs,getFirestore,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import {getAuth,GoogleAuthProvider,getRedirectResult,onAuthStateChanged,signInWithRedirect,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {addDoc,collection,doc,getDoc,getDocs,getFirestore,limit,orderBy,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const config=window.BAKER_FIREBASE_CONFIG;
 const button=document.querySelector('#account-button');
@@ -9,7 +9,7 @@ const feedback=document.querySelector('#account-feedback');
 const signedOut=document.querySelector('#account-state');
 const signedIn=document.querySelector('#signed-in-state');
 const publish=detail=>window.dispatchEvent(new CustomEvent('baker-auth-change',{detail}));
-const api={addDoc,collection,getDocs,query,serverTimestamp,where};
+const api={addDoc,collection,doc,getDoc,getDocs,limit,orderBy,query,serverTimestamp,setDoc,where};
 
 button.addEventListener('click',()=>dialog.showModal());
 
@@ -25,11 +25,17 @@ if(!config?.projectId){
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
 
+  const authMessage=error=>{
+    if(error?.code==='auth/unauthorized-domain')return 'This website address still needs to be approved in Firebase. Please tell Mrs. Baker the sign-in domain is not authorized.';
+    if(error?.code==='auth/operation-not-allowed')return 'Google sign-in has not been enabled for this class yet.';
+    if(error?.code==='auth/network-request-failed')return 'The network blocked Google sign-in. Check the connection and try again.';
+    return `Google sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}. Please try once more.`;
+  };
   document.querySelector('#google-signin').addEventListener('click',async()=>{
-    feedback.textContent='Opening school Google sign-in…';
-    try{await signInWithPopup(auth,provider)}
-    catch(error){feedback.textContent=error.code==='auth/popup-closed-by-user'?'Sign-in was canceled.':'Sign-in did not work. Please try again or ask Mrs. Baker for help.'}
+    feedback.textContent='Taking you to Google sign-in...';
+    try{await signInWithRedirect(auth,provider)}catch(error){feedback.textContent=authMessage(error)}
   });
+  getRedirectResult(auth).catch(error=>{feedback.textContent=authMessage(error);dialog.showModal()});
   document.querySelector('#sign-out').addEventListener('click',()=>signOut(auth));
   document.querySelector('#join-class').addEventListener('click',async()=>{
     const user=auth.currentUser;
@@ -45,7 +51,7 @@ if(!config?.projectId){
     signedOut.hidden=Boolean(user);
     signedIn.hidden=!user;
     button.textContent=user?(user.displayName?.split(' ')[0]||'My account'):'Student sign in';
-    if(!user){publish({ready:true,user:null,db});return}
+    if(!user){publish({ready:true,user:null,db,api});return}
     document.querySelector('#profile-name').textContent=user.displayName||'Student';
     document.querySelector('#profile-email').textContent=user.email||'';
     document.querySelector('#profile-initial').textContent=(user.displayName||'S')[0].toUpperCase();

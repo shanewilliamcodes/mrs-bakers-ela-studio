@@ -21,5 +21,14 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if isTeacher();
     }
+    match /leaderboard/{uid} {
+      allow read: if true;
+      allow create, update: if isOwner(uid)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.bestStreak is int
+        && request.resource.data.bestStreak >= 0
+        && request.resource.data.bestStreak <= 1000;
+      allow delete: if isOwner(uid) || isTeacher();
+    }
   }
 }

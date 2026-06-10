@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css?v=1">
   <link rel="stylesheet" href="account.css?v=2">
+  <link rel="stylesheet" href="leaderboard.css?v=1">
 </head>
 <body>
   <header class="topbar">
@@ -27,7 +28,8 @@
     <section class="view active" id="view-home">
       <div class="welcome">
         <p class="eyebrow">Lake Manatee K-8 · 2026–27</p>
-        <h1>Where do you need to go?</h1>
+        <h1>Mrs. Baker's<br><em>Grade 6 ELA Studio</em></h1>
+        <h2>Where do you need to go?</h2>
         <p>Choose a destination and get started. The most-used classroom tools are always one click away.</p>
       </div>
       <div class="launch-grid">
@@ -73,6 +75,7 @@
         </article>
         <aside class="strategy-card"><p class="eyebrow">Use this every time</p><h2>Question → Evidence → Choice → Check</h2><ol><li><b>1</b> Name exactly what the question asks.</li><li><b>2</b> Find the sentence or detail that proves it.</li><li><b>3</b> Predict an answer before reading choices.</li><li><b>4</b> Eliminate choices the text does not fully support.</li></ol><p><b>Remember:</b> This is skill practice, not an official FAST test or score predictor.</p></aside>
       </div>
+      <section class="leaderboard"><div><p class="eyebrow">Celebrate persistence</p><h2>FAST Streak Spotlight</h2><p>Only the ten strongest personal streaks appear. Keep practicing and your new best can earn a place here.</p></div><ol id="leaderboard-list"><li class="leaderboard-empty">Sign in and play to start our class leaderboard.</li></ol><p class="leaderboard-note">Privacy: first name and last initial only. Scores and lower rankings are never shown.</p></section>
     </section>
 
     <section class="view" id="view-explore">
@@ -85,7 +88,7 @@
     </section>
   </main>
 
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Class account</h2><p>Sign in so bell work is connected to the correct student.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">Use the Google account approved for this class.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><label>Class code<input id="class-code" maxlength="12" autocomplete="off" placeholder="Provided by Mrs. Baker"></label><button id="join-class" type="button">Join class</button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>One simple class account</h2><p>Sign in once with Google. Then enter Mrs. Baker's class code. That same account works for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">Step 1 of 2 · No password is created for this website.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><label>Step 2 of 2 · Class code<input id="class-code" maxlength="12" autocomplete="off" placeholder="Example: BAKER1"></label><button id="join-class" type="button">Finish setup</button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
   <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=1"></script>
 </body>
 </html>
