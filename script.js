@@ -1,6 +1,4 @@
-Exit code: 0
-Wall time: 0.3 seconds
-Output:
+
 const prompts = [
   "Write about a rule that makes sense until someone breaks it.",
   "Describe a place that feels different after dark. Use all five senses.",
