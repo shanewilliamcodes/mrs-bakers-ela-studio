@@ -1,56 +1,40 @@
 
-const prompts = [
-  "Write about a rule that makes sense until someone breaks it.",
-  "Describe a place that feels different after dark. Use all five senses.",
-  "Is loyalty always a good thing? Defend your answer with an example.",
-  "Begin a story with: Nobody noticed the empty chair until lunch.",
-  "What is something adults often misunderstand about being your age?",
-  "Choose an ordinary object and give it a secret history."
+const bellPrompts=[
+  {label:"Make a connection",prompt:"Describe a time when belonging to a group changed the way someone acted. What does that reveal about people?",starter:"One way belonging can affect a person's choices is..."},
+  {label:"Use precise details",prompt:"Describe an ordinary place so clearly that someone who has never seen it could picture it.",starter:"At first glance, the place seems..., but when you look closer..."},
+  {label:"Build an argument",prompt:"Should students be allowed to listen to music while working independently? State a claim and support it.",starter:"Students should / should not be allowed to... because..."},
+  {label:"Read like a writer",prompt:"Why might an author reveal important information slowly instead of all at once?",starter:"An author may delay important information in order to..."},
+  {label:"Vocabulary in context",prompt:"Write two sentences using the word reluctant. Make the second sentence provide a strong context clue.",starter:"Although I wanted to..., I was reluctant because..."}
 ];
-const tools = {
-  reading: [
-    ["Notice", "Mark details that repeat, surprise you, or create a strong feeling."],
-    ["Name", "Put the pattern into words: character, conflict, craft, or big idea."],
-    ["Connect", "Explain why it matters. Link the evidence to a larger interpretation."]
-  ],
-  writing: [
-    ["Claim", "Say something specific, arguable, and worth proving."],
-    ["Evidence", "Choose the strongest detail or quotation, not simply the first one."],
-    ["Reasoning", "Build the bridge between your evidence and your claim."]
-  ],
-  vocab: [
-    ["Context", "Read around the word. Look for examples, contrasts, tone, and clues."],
-    ["Parts", "Break the word into prefixes, roots, and suffixes you recognize."],
-    ["Use It", "Make the word yours by using it in a fresh sentence and conversation."]
-  ]
+const agenda={today:[['5 min','Bell Work','Respond, revise, and be ready to share.'],['10 min','Mini Lesson','Model today’s reading or writing skill.'],['25 min','StudySync Practice','Read, annotate, discuss, and apply the skill.'],['8 min','Small Group / Independent','Targeted practice or conference.'],['2 min','Exit Ticket','Name what you learned and your next step.']],week:[['Mon','Launch the skill','Teacher model + guided practice'],['Tue','Close reading','Annotate and gather evidence'],['Wed','Small groups','Targeted reteach and vocabulary'],['Thu','Write from reading','Claim, evidence, and reasoning'],['Fri','Check growth','Short assessment, reflection, and retry']],month:[['Week 1','Build background','Vocabulary, purpose, and first reads'],['Week 2','Read closely','Craft, structure, and evidence'],['Week 3','Write & discuss','Develop and defend ideas'],['Week 4','Show growth','Revise, assess, reflect, and celebrate'] ]};
+const strands={
+  literature:{title:"Literature",intro:"Understand how stories and poems create meaning through character, conflict, perspective, language, and theme.",skills:["Analyze how plot and character develop","Determine and support a theme","Compare perspectives and narrators","Explain figurative language and poetic form"],success:"I can make an idea about a text and prove it with the strongest details.",fast:"Often appears in theme, inference, point-of-view, and craft questions."},
+  information:{title:"Informational Text",intro:"Follow ideas across a text and evaluate how authors organize information, explain topics, and support claims.",skills:["Determine central idea and relevant details","Analyze text structure and features","Identify author purpose and perspective","Evaluate claims, reasons, and evidence"],success:"I can explain the most important idea and show how the author develops it.",fast:"Often appears in central idea, structure, purpose, and argument questions."},
+  writing:{title:"Writing",intro:"Plan, draft, revise, and edit writing that informs, argues, or tells a meaningful story.",skills:["Organize ideas for a clear purpose","Use evidence and elaboration","Vary sentences and choose precise words","Revise for meaning and edit conventions"],success:"I can make purposeful choices and improve my work using feedback.",fast:"Strong writing practice improves written responses and reading analysis."},
+  vocabulary:{title:"Vocabulary",intro:"Use context, word parts, relationships, and reference tools to unlock unfamiliar language.",skills:["Use context clues","Apply Greek and Latin roots","Recognize connotation and relationships","Use academic words accurately"],success:"I can explain how I figured out a word instead of only guessing.",fast:"Vocabulary-in-context questions reward evidence from the sentence and paragraph."},
+  communication:{title:"Communication",intro:"Listen to understand, build on ideas, collaborate productively, and present clearly.",skills:["Prepare for discussion with evidence","Ask and answer useful questions","Build on or challenge an idea respectfully","Present ideas with clear organization"],success:"I can help a group think better, not simply talk more.",fast:"Discussion strengthens the reasoning students use during independent assessment."}
 };
-const bookPaths = [
-  "Want high-stakes friendship and identity? Start with a realistic coming-of-age novel like The Outsiders.",
-  "Want a puzzle? Try a mystery with an unreliable narrator and keep a clue log.",
-  "Want another world? Choose a fantasy with a rule-based magic system and map its rules.",
-  "Short on time? Try a graphic novel or short-story collection. Visual reading is still real reading.",
-  "Want something true? Pick narrative nonfiction about a person, event, or question you already care about."
-];
-const promptCard = document.querySelector("#prompt-card");
-const promptText = document.querySelector("#prompt-text");
-function showPrompt(){ promptText.textContent = prompts[Math.floor(Math.random()*prompts.length)]; promptCard.hidden=false; }
-document.querySelector("#prompt-button").addEventListener("click",showPrompt);
-document.querySelector("#new-prompt").addEventListener("click",showPrompt);
-function renderTools(key){document.querySelector("#tool-content").innerHTML=tools[key].map(([title,body])=>`<article class="tool-card"><b>${title}</b><p>${body}</p></article>`).join("");}
-document.querySelectorAll(".tool-tabs button").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".tool-tabs button").forEach(b=>b.classList.remove("active"));button.classList.add("active");renderTools(button.dataset.tab);}));
-renderTools("reading");
-const date = new Date();
-document.querySelector("#today-date").textContent = date.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
-const result=document.querySelector("#book-result");
-document.querySelector("#book-picker").addEventListener("click",()=>{result.innerHTML=`${bookPaths[Math.floor(Math.random()*bookPaths.length)]}<button aria-label="Close suggestion">×</button>`;result.hidden=false;result.querySelector("button").addEventListener("click",()=>result.hidden=true);});
-const menu=document.querySelector(".menu-button"),nav=document.querySelector(".site-header nav");
-menu.addEventListener("click",()=>{const open=nav.classList.toggle("open");menu.setAttribute("aria-expanded",open);});
-nav.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>nav.classList.remove("open")));
-const fastContent={
-  Read:["Read the question first","Before reading every word, identify exactly what the item asks you to do. This gives your brain a target."],
-  Annotate:["Annotate with a purpose","Mark only the sentence or phrase that helps answer the question. Too many marks hide the strongest evidence."],
-  Choose:["Choose with evidence","Say your own answer first. Then test each option against the text and cross out choices that are partly true, off-topic, or unsupported."],
-  Explain:["Explain why it wins","Point to the exact words that prove the answer. If you cannot prove it, pause and reconsider your choice."]
+const toolData={
+  evidence:{title:"Evidence Builder",description:"Click a purpose to get a sentence frame you can adapt.",items:[["Introduce evidence","The text states, “___,” which shows..."],["Explain evidence","This detail matters because..."],["Make an inference","Readers can infer ___ because the author reveals..."],["Compare ideas","Both texts show ___; however, they differ because..."]]},
+  paragraph:{title:"Paragraph Planner",description:"Build in this order. Each move should do a different job.",items:[["1 · Point","Make a focused claim that answers the question."],["2 · Proof","Choose a detail or quotation that directly supports it."],["3 · Reasoning","Explain how the proof supports the point."],["4 · Link","Connect the paragraph back to the larger idea."]]},
+  vocab:{title:"Word Solver",description:"When a word is unfamiliar, try these clues before reaching for a dictionary.",items:[["Read around it","Look before and after the word for examples or contrasts."],["Break it apart","Find a prefix, root, or suffix you recognize."],["Test a synonym","Replace it with a possible meaning and reread."],["Check the tone","Decide whether the word feels positive, negative, or neutral."]]},
+  discussion:{title:"Discussion Stems",description:"Use language that makes conversation clearer and more thoughtful.",items:[["Build on","I’d like to add to ___’s idea because..."],["Disagree thoughtfully","I see it differently because the text suggests..."],["Ask for proof","Which detail led you to that conclusion?"],["Clarify","When you say ___, do you mean...?"]]}
 };
-document.querySelectorAll(".strategy-step").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".strategy-step").forEach(b=>b.classList.remove("active"));button.classList.add("active");const [title,copy]=fastContent[button.dataset.fast];document.querySelector("#fast-title").textContent=title;document.querySelector("#fast-copy").textContent=copy;}));
+const bellResponse=document.querySelector('#bell-response');let bellIndex=0;bellResponse.value=localStorage.getItem('bakerBellwork')||'';
+function updateCount(){document.querySelector('#word-count').textContent=bellResponse.value.trim()?bellResponse.value.trim().split(/\s+/).length:0}updateCount();
+bellResponse.addEventListener('input',()=>{updateCount();localStorage.setItem('bakerBellwork',bellResponse.value);document.querySelector('#save-status').textContent='Saved';});
+document.querySelector('#clear-response').addEventListener('click',()=>{bellResponse.value='';localStorage.removeItem('bakerBellwork');updateCount();document.querySelector('#save-status').textContent='Cleared';});
+document.querySelector('#new-bellwork').addEventListener('click',()=>{bellIndex=(bellIndex+1)%bellPrompts.length;const item=bellPrompts[bellIndex];document.querySelector('#bell-label').textContent=`Practice · ${item.label}`;document.querySelector('#bell-prompt').textContent=item.prompt;document.querySelector('#sentence-starter').textContent=item.starter;});
+let seconds=300,timerId=null;function drawTimer(){const m=String(Math.floor(seconds/60)).padStart(2,'0'),s=String(seconds%60).padStart(2,'0');document.querySelector('#timer-display').textContent=`${m}:${s}`}
+document.querySelector('#timer-button').addEventListener('click',e=>{if(timerId){clearInterval(timerId);timerId=null;e.target.textContent='Start';return}e.target.textContent='Pause';timerId=setInterval(()=>{if(seconds>0){seconds--;drawTimer()}else{clearInterval(timerId);timerId=null;e.target.textContent='Done'}},1000)});
+document.querySelector('#timer-reset').addEventListener('click',()=>{clearInterval(timerId);timerId=null;seconds=300;drawTimer();document.querySelector('#timer-button').textContent='Start'});
+function renderAgenda(key){document.querySelector('#agenda-content').innerHTML=agenda[key].map(x=>`<div class="agenda-item"><span>${x[0]}</span><div><b>${x[1]}</b><small>${x[2]}</small></div></div>`).join('')};renderAgenda('today');
+document.querySelector('#agenda-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+document.querySelectorAll('[data-agenda]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-agenda]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderAgenda(b.dataset.agenda)}));
+function renderStrand(key){const s=strands[key];document.querySelector('#strand-detail').innerHTML=`<div><p class="eyebrow pink">Grade 6 strand</p><h3>${s.title}</h3><p>${s.intro}</p><ul>${s.skills.map(x=>`<li>✓ ${x}</li>`).join('')}</ul><a href="https://www.cpalms.org/PreviewCourse/Preview/23030" target="_blank" rel="noreferrer">View Grade 6 course benchmarks ↗</a></div><div class="success-box"><b>What success sounds like</b><h3>“${s.success}”</h3><p><strong>FAST connection:</strong> ${s.fast}</p></div>`};renderStrand('literature');
+document.querySelectorAll('[data-strand]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-strand]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderStrand(b.dataset.strand)}));
+document.querySelectorAll('#fast-answers button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#fast-answers button').forEach(x=>x.classList.remove('correct','wrong'));const good=b.dataset.correct==='true';b.classList.add(good?'correct':'wrong');document.querySelector('#fast-feedback').innerHTML=good?'<b>Correct.</b> The passage says the cleanup helps immediately and also aims to change everyday choices.':'<b>Not quite.</b> This choice is too narrow or unsupported. Look for an answer that includes both the immediate cleanup and its larger purpose.'}));
+function renderTool(key){const t=toolData[key];document.querySelector('#tool-panel').innerHTML=`<h3>${t.title}</h3><p>${t.description}</p><div class="stem-grid">${t.items.map((x,i)=>`<button class="stem-card" data-stem="${i}"><b>${x[0]}</b>${x[1]}</button>`).join('')}</div><div class="stem-output" id="stem-output">Choose a tool above.</div>`;document.querySelectorAll('[data-stem]').forEach(b=>b.addEventListener('click',()=>document.querySelector('#stem-output').textContent=t.items[Number(b.dataset.stem)][1]))};renderTool('evidence');
+document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tool]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderTool(b.dataset.tool)}));
+const menu=document.querySelector('.menu-button'),nav=document.querySelector('.site-header nav');menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',open)});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));
 
