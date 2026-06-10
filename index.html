@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="account.css?v=2">
   <link rel="stylesheet" href="leaderboard.css?v=1">
   <link rel="stylesheet" href="account-fixes.css?v=1">
+  <link rel="stylesheet" href="analytics.css?v=1">
 </head>
 <body>
   <header class="topbar">
@@ -84,13 +85,28 @@
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Learning beyond today's task</p><h1>Explore the ELA Studio</h1><p>Standards, leadership habits, public assessment context, and useful links.</p></div>
       <div class="explore-tabs"><button class="active" data-panel="learning">B.E.S.T. Map</button><button data-panel="data">Public Data</button><button data-panel="habits">7 Habits</button><button data-panel="resources">Resources</button></div>
       <div class="explore-panel active" id="panel-learning"><h2>Grade 6 B.E.S.T. learning map</h2><p>Our StudySync lessons build skills across five connected areas.</p><div class="strand-grid"><article><b>Reading Literature</b><span>Character, setting, plot, theme, perspective, and poetry</span></article><article><b>Reading Informational Text</b><span>Central idea, structure, purpose, perspective, and argument</span></article><article><b>Writing</b><span>Argumentative, expository, and narrative communication</span></article><article><b>Vocabulary</b><span>Morphology, context, figurative language, and reference tools</span></article><article><b>Communication</b><span>Discussion, collaboration, presentation, and research</span></article></div><a class="resource-link" href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf#page=79" target="_blank" rel="noreferrer">Official Grade 6 Florida B.E.S.T. ELA standards ↗</a></div>
-      <div class="explore-panel" id="panel-data"><h2>Public Grade 6 FAST context</h2><p>Spring 2025 results provide context, not labels. Lake Manatee K-8 begins its baseline year in 2026–27.</p><div class="data-cards"><article><small>Florida Level 3+</small><b>60%</b></article><article><small>Manatee Level 3+</small><b>53%</b></article><article><small>Manatee students tested</small><b>3,861</b></article><article><small>Lake Manatee</small><b>Baseline year</b></article></div><p class="data-note">Manatee Grade 6 distribution: Level 1 24%, Level 2 23%, Level 3 22%, Level 4 20%, Level 5 12%. Percentages are rounded. PM1 and PM2 are progress-monitoring checkpoints; PM3 is the year-end result.</p></div>
+      <div class="explore-panel" id="panel-data"><h2>Public Grade 6 FAST data</h2><p>A clear picture of how Grade 6 readers performed on Florida's 2025 ELA assessment — shown for context, not labels. Lake Manatee K-8 begins its baseline year in 2026–27.</p>
+        <div class="analytics" id="analytics">
+          <section class="ana-block">
+            <div class="ana-head"><b>Reading on grade level (Level 3 and above)</b><span>Spring 2025 · Grade 6 ELA</span></div>
+            <div class="prof-bars" id="prof-bars"></div>
+          </section>
+          <section class="ana-block">
+            <div class="ana-head"><b>How Manatee Grade 6 scores were spread</b><span>Tap a level to see what it means</span></div>
+            <div class="level-bar" id="level-bar"></div>
+            <div class="pass-key"><span class="below">◀ Below grade level</span><span class="above">On grade level (Level 3+) ▶</span></div>
+            <ul class="level-legend" id="level-legend"></ul>
+            <p class="level-detail" id="level-detail">Tap any level above for a plain-language explanation families can use.</p>
+          </section>
+          <p class="data-note" id="data-source"></p>
+        </div>
+      </div>
       <div class="explore-panel" id="panel-habits"><h2>The 7 Habits in ELA</h2><div class="habit-list"><article><b>1</b><span><strong>Be Proactive</strong> Ask for the support you need.</span></article><article><b>2</b><span><strong>Begin With the End in Mind</strong> Know the learning goal before you begin.</span></article><article><b>3</b><span><strong>Put First Things First</strong> Complete the most important step first.</span></article><article><b>4</b><span><strong>Think Win-Win</strong> Build solutions where everyone learns.</span></article><article><b>5</b><span><strong>Seek First to Understand</strong> Listen closely before responding.</span></article><article><b>6</b><span><strong>Synergize</strong> Combine ideas to create stronger work.</span></article><article><b>7</b><span><strong>Sharpen the Saw</strong> Care for your mind and reading life.</span></article></div></div>
       <div class="explore-panel" id="panel-resources"><h2>Resource shelf</h2><div class="resource-list"><a href="teacher.html"><b>Teacher Dashboard Preview</b><span>See sample bell-work submissions →</span></a><a href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. ELA Standards</b><span>Official benchmarks and clarifications ↗</span></a><a href="https://www.fldoe.org/file/20102/TDS-FAST-ELA.pdf" target="_blank" rel="noreferrer"><b>Grade 6 FAST ELA Blueprint</b><span>Assessed benchmarks and reporting categories ↗</span></a><a href="https://flfast.org/families.html" target="_blank" rel="noreferrer"><b>FAST Family Portal</b><span>Official student and family resources ↗</span></a><a href="https://www.manateeschools.net/" target="_blank" rel="noreferrer"><b>Manatee County Schools</b><span>District information and services ↗</span></a><a href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank" rel="noreferrer"><b>Purdue Writing Lab</b><span>Writing and grammar support ↗</span></a></div></div>
     </section>
   </main>
 
   <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="account-ready">Your account is ready.</p><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=1"></script>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=2"></script>
 </body>
 </html>

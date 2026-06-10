@@ -57,4 +57,31 @@ function renderQuestion(){if(fastIndex>=fastOrder.length)fastOrder=shuffle(quest
 function answerQuestion(choice){const q=fastOrder[fastIndex],correct=choice===q.correct;document.querySelectorAll('[data-answer]').forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('correct');else if(i===choice)b.classList.add('incorrect')});if(correct){score+=10+Math.min(streak,5)*2;streak++;skillScores[q.type]=(skillScores[q.type]||0)+1;saveBestStreak()}else streak=0;document.querySelector('#fast-feedback').innerHTML=`<b>${correct?'Correct!':'Not quite.'}</b> ${escapeHtml(q.explanation)}`;document.querySelector('#fast-next').hidden=false;updateGame()}
 function updateGame(){document.querySelector('#fast-score').textContent=score;document.querySelector('#fast-streak').textContent=streak;document.querySelector('#fast-count').textContent=fastIndex;const best=Object.entries(skillScores).sort((a,b)=>b[1]-a[1])[0];document.querySelector('#fast-best').textContent=best?best[0]:'Start playing'}
 document.querySelector('#fast-next').addEventListener('click',()=>{fastIndex++;renderQuestion();updateGame()});document.querySelector('#fast-reset').addEventListener('click',resetFast);resetFast();
-document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-panel]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.explore-panel').forEach(x=>x.classList.toggle('active',x.id===`panel-${b.dataset.panel}`))}));
+document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-panel]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.explore-panel').forEach(x=>x.classList.toggle('active',x.id===`panel-${b.dataset.panel}`));if(b.dataset.panel==='data')setTimeout(revealAnalytics,60)}));
+
+// ---- Public Grade 6 FAST analytics (Explore → Public Data) ----
+// Source: Florida DOE 2025 Statewide Assessment Results, Grade 6 ELA. Edit these
+// numbers to update the charts. Percentages are rounded and may not total 100.
+const fastData={
+  tested:3861,
+  proficiency:[{label:'Florida',pct:60},{label:'Manatee County',pct:53}],
+  levels:[
+    {n:1,name:'Needs substantial support',pct:24,passing:false,blurb:'Reading skills are still developing and need the most support. With focused daily practice, this is the group that can show the biggest growth across a school year.'},
+    {n:2,name:'Approaching grade level',pct:23,passing:false,blurb:'Close to grade level. A consistent year of reading-strategy practice moves many of these students up to Level 3.'},
+    {n:3,name:'On grade level',pct:22,passing:true,blurb:'The FAST “passing” line. Students show a satisfactory understanding of Grade 6 reading skills.'},
+    {n:4,name:'Proficient',pct:20,passing:true,blurb:'Students apply Grade 6 reading skills confidently across different kinds of texts.'},
+    {n:5,name:'Mastery',pct:12,passing:true,blurb:'Students handle complex texts and tricky questions with consistent accuracy.'}
+  ]
+};
+const levelColors=['#f7d7e3','#f0a9c4','#d94f82','#a43863','#742747'];
+function selectLevel(i){const l=fastData.levels[i];document.querySelectorAll('.level-seg,.legend-row').forEach(b=>b.classList.toggle('selected',Number(b.dataset.level)===i));const d=document.querySelector('#level-detail');d.style.borderLeftColor=levelColors[i];d.innerHTML=`<b style="color:${levelColors[i]}">Level ${l.n} · ${escapeHtml(l.name)}</b> — ${escapeHtml(l.blurb)}<em>${l.passing?'Counts as reading on grade level (Level 3 and above).':'Below the Grade 6 grade-level line — a focus area for growth.'}</em>`}
+function revealAnalytics(){document.querySelectorAll('.prof-fill').forEach(f=>{f.style.width=f.dataset.pct+'%'});document.querySelectorAll('.level-seg').forEach((s,i)=>{s.style.flexGrow=fastData.levels[i].pct})}
+function buildAnalytics(){
+  const profEl=document.querySelector('#prof-bars');if(!profEl)return;
+  profEl.innerHTML=fastData.proficiency.map(p=>`<div class="prof-row"><span class="prof-label">${p.label}</span><div class="prof-track"><div class="prof-fill" data-pct="${p.pct}" style="width:0"><b>${p.pct}%</b></div></div></div>`).join('');
+  document.querySelector('#level-bar').innerHTML=fastData.levels.map((l,i)=>`<button class="level-seg" data-level="${i}" style="flex-grow:0;flex-basis:0;background:${levelColors[i]};color:${i>=2?'#fff':'var(--deep)'}" aria-label="Level ${l.n}, ${l.pct} percent"><b>${l.pct}%</b><small>L${l.n}</small></button>`).join('');
+  document.querySelector('#level-legend').innerHTML=fastData.levels.map((l,i)=>`<li><button class="legend-row" data-level="${i}"><span class="dot" style="background:${levelColors[i]}"></span><b>Level ${l.n}</b><span class="legend-name">${escapeHtml(l.name)}</span><b class="legend-pct">${l.pct}%</b></button></li>`).join('');
+  document.querySelectorAll('.level-seg,.legend-row').forEach(b=>b.addEventListener('click',()=>selectLevel(Number(b.dataset.level))));
+  document.querySelector('#data-source').innerHTML=`Source: Florida Department of Education, 2025 Statewide Assessment Results (Grade 6 ELA). Manatee County students tested: ${fastData.tested.toLocaleString()}. Percentages are rounded and may not total 100. Shown for context only — please verify against the official district report before sharing widely. Updated June 2026.`;
+}
+buildAnalytics();

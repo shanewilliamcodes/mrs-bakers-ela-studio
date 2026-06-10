@@ -1,0 +1,42 @@
+/* Public FAST analytics section (Explore → Public Data) */
+.analytics{display:grid;gap:28px;margin-top:24px}
+.ana-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ana-head b{font-size:1.08rem;color:var(--deep)}
+.ana-head span{color:var(--muted);font-size:.85rem}
+
+/* Proficiency comparison bars */
+.prof-bars{display:grid;gap:14px}
+.prof-row{display:grid;grid-template-columns:140px 1fr;align-items:center;gap:14px}
+.prof-label{font-weight:600}
+.prof-track{position:relative;background:var(--blush);border-radius:999px;height:36px;overflow:hidden}
+.prof-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--deep));display:flex;align-items:center;justify-content:flex-end;padding-right:13px;transition:width 1.1s cubic-bezier(.22,1,.36,1);min-width:46px}
+.prof-fill b{color:#fff;font-size:.95rem}
+
+/* Achievement level segmented bar */
+.level-bar{display:flex;gap:3px;height:78px;border-radius:14px;overflow:hidden}
+.level-seg{border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:flex-grow .9s cubic-bezier(.22,1,.36,1),filter .2s;min-width:0;padding:4px;flex-grow:0}
+.level-seg small{opacity:.85;font-size:.72rem}
+.level-seg b{font-size:.96rem}
+.level-seg:hover{filter:brightness(1.07)}
+.level-seg.selected{outline:3px solid var(--ink);outline-offset:-3px}
+.pass-key{display:flex;justify-content:space-between;margin:9px 2px 0;font-size:.78rem;color:var(--muted)}
+.pass-key .above{color:var(--deep);font-weight:700}
+
+/* Level legend rows (clickable) */
+.level-legend{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:6px}
+.legend-row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;text-align:left}
+.legend-row:hover{background:var(--blush)}
+.legend-row.selected{border-color:var(--deep);background:var(--blush)}
+.legend-row .dot{width:14px;height:14px;border-radius:50%;flex:none}
+.legend-row b{color:var(--deep)}
+.legend-name{color:var(--muted);flex:1}
+.legend-pct{color:var(--ink)}
+
+.level-detail{margin-top:16px;padding:16px 18px;background:var(--blush);border-left:4px solid var(--pink);border-radius:0 12px 12px 0;line-height:1.6}
+.level-detail em{color:var(--muted);font-style:normal;display:block;margin-top:6px;font-size:.88rem}
+
+@media(max-width:560px){
+  .prof-row{grid-template-columns:1fr;gap:6px}
+  .level-seg b{font-size:.8rem}
+  .legend-name{flex-basis:100%;order:3;margin-top:2px}
+}
