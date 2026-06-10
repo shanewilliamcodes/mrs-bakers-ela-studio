@@ -1,0 +1,58 @@
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,GoogleAuthProvider,onAuthStateChanged,signInWithPopup,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {addDoc,collection,doc,getDoc,getDocs,getFirestore,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const config=window.BAKER_FIREBASE_CONFIG;
+const button=document.querySelector('#account-button');
+const dialog=document.querySelector('#account-dialog');
+const feedback=document.querySelector('#account-feedback');
+const signedOut=document.querySelector('#account-state');
+const signedIn=document.querySelector('#signed-in-state');
+const publish=detail=>window.dispatchEvent(new CustomEvent('baker-auth-change',{detail}));
+const api={addDoc,collection,getDocs,query,serverTimestamp,where};
+
+button.addEventListener('click',()=>dialog.showModal());
+
+if(!config?.projectId){
+  button.textContent='Accounts coming soon';
+  document.querySelector('#google-signin').disabled=true;
+  feedback.textContent='Secure account storage is being connected. Bell-work drafts still save privately on this device.';
+  publish({ready:false,user:null});
+}else{
+  const app=initializeApp(config);
+  const auth=getAuth(app);
+  const db=getFirestore(app);
+  const provider=new GoogleAuthProvider();
+  provider.setCustomParameters({prompt:'select_account'});
+
+  document.querySelector('#google-signin').addEventListener('click',async()=>{
+    feedback.textContent='Opening school Google sign-in…';
+    try{await signInWithPopup(auth,provider)}
+    catch(error){feedback.textContent=error.code==='auth/popup-closed-by-user'?'Sign-in was canceled.':'Sign-in did not work. Please try again or ask Mrs. Baker for help.'}
+  });
+  document.querySelector('#sign-out').addEventListener('click',()=>signOut(auth));
+  document.querySelector('#join-class').addEventListener('click',async()=>{
+    const user=auth.currentUser;
+    const classCode=document.querySelector('#class-code').value.trim().toUpperCase();
+    if(!user||classCode.length<4){feedback.textContent='Enter the class code Mrs. Baker gave you.';return}
+    const current=await getDoc(doc(db,'users',user.uid));
+    const role=current.data()?.role||'student';
+    await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',classCode,role,updatedAt:serverTimestamp()},{merge:true});
+    feedback.textContent=`Joined class ${classCode}.`;
+    publish({ready:true,user,db,classCode,role,api});
+  });
+  onAuthStateChanged(auth,async user=>{
+    signedOut.hidden=Boolean(user);
+    signedIn.hidden=!user;
+    button.textContent=user?(user.displayName?.split(' ')[0]||'My account'):'Student sign in';
+    if(!user){publish({ready:true,user:null,db});return}
+    document.querySelector('#profile-name').textContent=user.displayName||'Student';
+    document.querySelector('#profile-email').textContent=user.email||'';
+    document.querySelector('#profile-initial').textContent=(user.displayName||'S')[0].toUpperCase();
+    const profileSnap=await getDoc(doc(db,'users',user.uid)).catch(()=>null);
+    const profile=profileSnap?.data()||{};
+    document.querySelector('#class-code').value=profile.classCode||'';
+    document.querySelector('#teacher-link').hidden=profile.role!=='teacher';
+    publish({ready:true,user,db,classCode:profile.classCode||'',role:profile.role||'student',api});
+  });
+}

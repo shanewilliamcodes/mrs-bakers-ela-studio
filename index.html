@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="redesign.css?v=5">
+  <link rel="stylesheet" href="account.css?v=1">
 </head>
 <body>
   <div class="announcement"><b>2026–27</b> Welcome to sixth-grade ELA at Lake Manatee K-8.</div>
@@ -17,7 +18,7 @@
     <a class="brand" href="#home"><span>TB</span><div><b>Mrs. Baker's</b><small>ELA Studio</small></div></a>
     <button class="menu-button" aria-label="Open navigation" aria-expanded="false">Menu</button>
     <nav aria-label="Main navigation">
-      <a href="#dashboard">Today</a><a href="#learning">Learning Map</a><a href="#fast">FAST</a><a href="#analytics">Data</a><a href="#habits">7 Habits</a><a href="syllabus.html">Syllabus</a>
+      <a href="#dashboard">Today</a><a href="#learning">B.E.S.T. Map</a><a href="#fast">FAST</a><a href="#analytics">Data</a><a href="#habits">7 Habits</a><a href="syllabus.html">Syllabus</a><button class="account-button" id="account-button" type="button">Student sign in</button>
     </nav>
   </header>
 
@@ -40,15 +41,22 @@
     </section>
 
     <section class="dashboard" id="dashboard">
-      <div class="section-heading"><div><p class="eyebrow rose">Classroom dashboard</p><h2>First things first.</h2></div><p>Begin with bell work, then check the plan. Your response saves automatically on this device.</p></div>
+      <div class="section-heading"><div><p class="eyebrow rose">Classroom dashboard</p><h2>First things first.</h2></div><p>Sign in, complete today’s bell work, review it, and submit it to Mrs. Baker. Drafts save automatically.</p></div>
       <div class="dashboard-grid">
         <article class="bellwork-card">
-          <div class="card-top"><div><span class="status-dot"></span> Bell Work</div><div class="timer" aria-live="polite"><b id="timer-display">05:00</b><button id="timer-button">Start</button><button id="timer-reset" aria-label="Reset timer">↺</button></div></div>
-          <p class="prompt-label" id="bell-label">Monday · Make a connection</p>
-          <h3 id="bell-prompt">Describe a time when belonging to a group changed the way someone acted. What does that reveal about people?</h3>
-          <textarea id="bell-response" rows="7" placeholder="Write your response here. Aim for 4–6 thoughtful sentences." aria-label="Bell work response"></textarea>
-          <div class="response-tools"><span><b id="word-count">0</b> words · <i id="save-status">Ready</i></span><div><button id="clear-response">Clear</button><button id="new-bellwork">New prompt</button></div></div>
-          <details><summary>Need a sentence starter?</summary><p id="sentence-starter">One way belonging can affect a person's choices is...</p></details>
+          <div class="card-top"><div><span class="status-dot"></span> Today’s Bell Work <span class="bell-date" id="bell-date"></span></div><div class="timer" aria-live="polite"><b id="timer-display">05:00</b><button id="timer-button">Start</button><button id="timer-reset" aria-label="Reset timer">↺</button></div></div>
+          <div class="bell-progress" aria-label="Bell work steps"><span class="active">1 Read</span><span>2 Write</span><span>3 Check</span><span>4 Submit</span></div>
+          <p class="prompt-label" id="bell-label">ELA.6.R.1.1 · Literary Elements</p>
+          <h3 id="bell-prompt">Think of a character from a story you know. What is one choice the character makes, and how does that choice affect what happens next?</h3>
+          <div class="response-goal"><span>Goal: <b id="response-goal">4–6 complete sentences</b></span><span id="draft-owner">Private device draft</span></div>
+          <textarea id="bell-response" rows="8" placeholder="Write your response here. Explain your thinking and include a specific example." aria-label="Bell work response"></textarea>
+          <div class="writing-meter"><span id="writing-meter-fill"></span></div>
+          <div class="response-tools"><span><b id="word-count">0</b> words · <b id="sentence-count">0</b> sentences · <i id="save-status">Ready</i></span><div><button id="clear-response">Clear</button><button id="new-bellwork">Practice prompt</button></div></div>
+          <details><summary>Need a sentence starter?</summary><p id="sentence-starter">The character’s choice to ___ affects the story because ___.</p></details>
+          <div class="bell-checklist"><p><b>Before you submit</b> <span id="check-summary">0 of 3 ready</span></p><label><input type="checkbox" id="check-answer"> I answered every part of the prompt.</label><label><input type="checkbox" id="check-evidence"> I included a specific detail or example.</label><label><input type="checkbox" id="check-revise"> I reread and fixed at least one thing.</label></div>
+          <div class="bell-submit-row"><label for="confidence">How confident are you?</label><select id="confidence"><option value="">Choose one</option><option value="1">1 · I need help</option><option value="2">2 · I’m getting started</option><option value="3">3 · I mostly understand</option><option value="4">4 · I can explain it</option></select><button class="submit-bellwork" id="submit-bellwork" type="button">Submit to Mrs. Baker</button></div>
+          <p class="submission-message" id="submission-message" role="status">Sign in to submit. You can still draft on this device.</p>
+          <details class="bell-history"><summary>My recent bell work <span id="history-count">0</span></summary><div id="bell-history-list"><p>Sign in to see submitted work from any device.</p></div></details>
         </article>
 
         <article class="agenda-card">
@@ -122,8 +130,8 @@
     <section class="resources" id="resources">
       <div class="section-heading"><div><p class="eyebrow rose">Reference shelf</p><h2>Resources for deeper help</h2></div><p>Useful official and academic links that matter, but do not need to crowd the daily classroom tools.</p></div>
       <div class="resource-grid">
-        <a href="https://www.cpalms.org/PreviewCourse/Preview/23030" target="_blank" rel="noreferrer"><b>Florida Grade 6 ELA Course</b><span>Current B.E.S.T. course and benchmark access via CPALMS ↗</span></a>
-        <a href="https://www.fldoe.org/accountability/assessments/k-12-student-assessment/best/" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. Information</b><span>State standards and assessment information ↗</span></a>
+        <a href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. ELA Standards</b><span>Official benchmarks, clarifications, and appendices ↗</span></a>
+        <a href="https://www.fldoe.org/file/20102/TDS-FAST-ELA.pdf" target="_blank" rel="noreferrer"><b>Grade 6 FAST ELA Blueprint</b><span>Official assessed benchmarks and reporting categories ↗</span></a>
         <a href="https://www.manateeschools.net/" target="_blank" rel="noreferrer"><b>Manatee County Schools</b><span>District information and family services ↗</span></a>
         <a href="https://www.mymanatee.org/departments/manatee_county_public_library_system" target="_blank" rel="noreferrer"><b>Manatee Libraries</b><span>Books, research databases, and digital access ↗</span></a>
         <a href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank" rel="noreferrer"><b>Purdue Writing Lab</b><span>Writing, grammar, and citation help ↗</span></a>
@@ -133,7 +141,10 @@
   </main>
 
   <footer><a class="brand" href="#home"><span>TB</span><div><b>Mrs. Baker's</b><small>ELA Studio</small></div></a><p>Lake Manatee K-8 · Grade 6 ELA<br><small>StudySync · Florida B.E.S.T. · 2026–27</small></p><a href="#home">Back to top ↑</a></footer>
-  <script src="script.js?v=5"></script>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow rose">Mrs. Baker’s ELA Studio</p><h2>Student account</h2><p>Use your school Google account so drafts and submitted bell work follow you between devices.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with school Google</button><p class="privacy-note">Only classroom work and basic account identity are stored. Accounts must be approved by the school before student use.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><label>Class code<input id="class-code" maxlength="12" autocomplete="off" placeholder="Provided by Mrs. Baker"></label><button id="join-class" type="button">Join class</button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <script src="firebase-config.js"></script>
+  <script type="module" src="firebase-app.js"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
 

@@ -1,0 +1,1 @@
+window.BAKER_FIREBASE_CONFIG = null;
