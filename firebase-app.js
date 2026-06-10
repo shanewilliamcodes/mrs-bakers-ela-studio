@@ -1,5 +1,5 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {browserLocalPersistence,getAuth,GoogleAuthProvider,onAuthStateChanged,setPersistence,signInWithPopup,signInWithRedirect,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {browserLocalPersistence,getAuth,getRedirectResult,GoogleAuthProvider,onAuthStateChanged,setPersistence,signInWithPopup,signInWithRedirect,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {addDoc,collection,doc,getDoc,getDocs,getFirestore,limit,orderBy,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const config=window.BAKER_FIREBASE_CONFIG;
@@ -27,12 +27,16 @@ if(!config?.projectId){
   setPersistence(auth,browserLocalPersistence).catch(()=>{});
 
   const authMessage=error=>{
-    if(error?.code==='auth/popup-closed-by-user')return 'The Google sign-in window was closed before it finished. Click Continue with Google to try again.';
+    if(error?.code==='auth/popup-closed-by-user')return 'The Google sign-in window closed before it finished. If Google showed an "Access blocked" message, your school account may not be allowed to sign in to outside sites — please tell Mrs. Baker. Otherwise click Continue with Google to try again.';
+    if(error?.code==='auth/admin-restricted-operation'||error?.code==='auth/user-disabled')return 'Your school may not allow this account to sign in to outside websites. Please ask Mrs. Baker — she can check with the district.';
     if(error?.code==='auth/unauthorized-domain')return 'This website address still needs to be approved in Firebase. Please tell Mrs. Baker the sign-in domain is not authorized.';
     if(error?.code==='auth/operation-not-allowed')return 'Google sign-in has not been enabled for this class yet.';
     if(error?.code==='auth/network-request-failed')return 'The network blocked Google sign-in. Check the connection and try again.';
-    return `Google sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}. Please try once more.`;
+    return `Google sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}. Please try once more, or tell Mrs. Baker if it keeps happening.`;
   };
+  // The redirect fallback (used when popups are blocked) returns here after the page reloads.
+  // Surface any error so a blocked-by-district account isn't a silent failure.
+  getRedirectResult(auth).catch(error=>{feedback.textContent=authMessage(error)});
   document.querySelector('#google-signin').addEventListener('click',async()=>{
     feedback.textContent='Opening Google sign-in...';
     try{
