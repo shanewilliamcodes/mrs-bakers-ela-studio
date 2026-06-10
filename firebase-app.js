@@ -54,13 +54,22 @@ if(!config?.projectId){
     document.querySelector('#profile-name').textContent=user.displayName||'Student';
     document.querySelector('#profile-email').textContent=user.email||'';
     document.querySelector('#profile-initial').textContent=(user.displayName||'S')[0].toUpperCase();
-    const profileSnap=await getDoc(doc(db,'users',user.uid)).catch(()=>null);
-    const profile=profileSnap?.data()||{};
-    if(!profileSnap?.exists()){
-      await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',role:'student',updatedAt:serverTimestamp()});
+    // Unlock the page as soon as Google sign-in succeeds. Reading/creating the Firestore
+    // profile is best-effort: if it fails (e.g. rules not yet deployed) it must NOT lock the
+    // student out of viewing bell work / the FAST challenge.
+    let role='student';
+    try{
+      const profileSnap=await getDoc(doc(db,'users',user.uid));
+      if(profileSnap.exists()){
+        role=profileSnap.data()?.role||'student';
+      }else{
+        await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',role:'student',updatedAt:serverTimestamp()});
+      }
+    }catch(error){
+      console.warn('Profile sync deferred (sign-in still succeeded):',error?.code||error);
     }
-    document.querySelector('#teacher-link').hidden=profile.role!=='teacher';
-    publish({ready:true,user,db,role:profile.role||'student',api});
+    document.querySelector('#teacher-link').hidden=role!=='teacher';
+    publish({ready:true,user,db,role,api});
     feedback.textContent='Signed in. Your account is ready.';
     if(dialog.open)setTimeout(()=>dialog.close(),600);
   });
