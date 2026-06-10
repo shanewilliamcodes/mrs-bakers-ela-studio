@@ -1,150 +1,91 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Mrs. Tori Baker's Grade 6 ELA classroom hub at Lake Manatee K-8.">
   <title>Mrs. Baker's Grade 6 ELA Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="redesign.css?v=5">
-  <link rel="stylesheet" href="account.css?v=1">
+  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="account.css?v=2">
 </head>
 <body>
-  <div class="announcement"><b>2026–27</b> Welcome to sixth-grade ELA at Lake Manatee K-8.</div>
-  <header class="site-header">
-    <a class="brand" href="#home"><span>TB</span><div><b>Mrs. Baker's</b><small>ELA Studio</small></div></a>
-    <button class="menu-button" aria-label="Open navigation" aria-expanded="false">Menu</button>
-    <nav aria-label="Main navigation">
-      <a href="#dashboard">Today</a><a href="#learning">B.E.S.T. Map</a><a href="#fast">FAST</a><a href="#analytics">Data</a><a href="#habits">7 Habits</a><a href="syllabus.html">Syllabus</a><button class="account-button" id="account-button" type="button">Student sign in</button>
+  <header class="topbar">
+    <button class="brand" data-view="home"><span>TB</span><div><b>Mrs. Baker's</b><small>Grade 6 ELA Studio</small></div></button>
+    <nav aria-label="Primary navigation">
+      <button data-view="home" class="active">Launchpad</button>
+      <button data-view="bellwork">Bell Work</button>
+      <button data-view="fast">FAST Practice</button>
+      <button data-view="explore">Explore</button>
     </nav>
+    <button class="account-button" id="account-button" type="button">Student sign in</button>
   </header>
 
   <main>
-    <section class="hero" id="home">
-      <div class="hero-art" aria-hidden="true"></div>
-      <div class="hero-copy">
-        <p class="eyebrow">Lake Manatee K-8 · Grade 6 English Language Arts</p>
-        <h1>Read closely.<br><em>Grow boldly.</em></h1>
-        <p>Everything students need for the day: bell work, class plans, StudySync, FAST practice, and tools for becoming stronger readers and writers.</p>
-        <a class="primary-button" href="#dashboard">Start class <span>↓</span></a>
+    <section class="view active" id="view-home">
+      <div class="welcome">
+        <p class="eyebrow">Lake Manatee K-8 · 2026–27</p>
+        <h1>Where do you need to go?</h1>
+        <p>Choose a destination and get started. The most-used classroom tools are always one click away.</p>
       </div>
+      <div class="launch-grid">
+        <button class="launch-card featured" data-view="bellwork"><span class="card-icon">BW</span><div><small>Start here</small><h2>Today's Bell Work</h2><p>Sign in, respond, review, and submit directly to Mrs. Baker.</p></div><b>Open →</b></button>
+        <a class="launch-card" href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="card-icon schoology">S</span><div><small>Daily class work</small><h2>Schoology</h2><p>Assignments, announcements, grades, and updates.</p></div><b>Launch ↗</b></a>
+        <a class="launch-card" href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="card-icon studysync">SS</span><div><small>ELA curriculum</small><h2>StudySync</h2><p>Texts, lessons, annotations, and writing assignments.</p></div><b>Launch ↗</b></a>
+        <button class="launch-card fast-card" data-view="fast"><span class="card-icon">F</span><div><small>Practice anytime</small><h2>FAST Challenge</h2><p>Original Grade 6 practice with feedback, streaks, and skill tracking.</p></div><b>Play →</b></button>
+        <a class="launch-card" href="syllabus.html"><span class="card-icon syllabus">ELA</span><div><small>Course guide</small><h2>Syllabus</h2><p>Expectations, grading, routines, and family information.</p></div><b>View →</b></a>
+        <button class="launch-card secondary" data-view="explore"><span class="card-icon">+</span><div><small>More from class</small><h2>Explore</h2><p>B.E.S.T. learning map, public data, 7 Habits, and resources.</p></div><b>Browse →</b></button>
+      </div>
+      <div class="home-note"><b>Today's focus</b><span id="home-focus">Build a claim and support it with clear evidence.</span><button data-view="bellwork">Begin bell work</button></div>
     </section>
 
-    <section class="quick-launch" aria-label="Frequently used classroom links">
-      <div><p class="eyebrow">Open every day</p><h2>Your class launchpad</h2></div>
-      <a href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="launch-icon">S</span><div><b>Schoology</b><small>Assignments, updates & grades</small></div><i>Open ↗</i></a>
-      <a href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="launch-icon alt">SS</span><div><b>StudySync</b><small>Texts, lessons & writing</small></div><i>Open ↗</i></a>
-      <a href="syllabus.html"><span class="launch-icon pale">ELA</span><div><b>Class Syllabus</b><small>Course overview & policies</small></div><i>View →</i></a>
+    <section class="view" id="view-bellwork">
+      <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Today's work</p><h1>Bell Work</h1><p>A new B.E.S.T.-aligned thinking routine every school day.</p></div>
+      <div class="auth-gate" id="bellwork-gate">
+        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Continue with Google</button><small>Use the Google account approved for this class.</small>
+      </div>
+      <article class="bell-workspace" id="bellwork-workspace" hidden>
+        <div class="bell-header"><div><span id="bell-day-type">Monday · Make a Claim</span><h2 id="bell-prompt">Loading today's prompt...</h2></div><div><small id="bell-date"></small><b id="bell-label"></b></div></div>
+        <div class="bell-support"><span>Target: <b id="response-goal"></b></span><button id="starter-toggle">Sentence starter</button><p id="sentence-starter" hidden></p></div>
+        <label class="response-label" for="bell-response">Your response</label>
+        <textarea id="bell-response" rows="10" placeholder="Write your response here..."></textarea>
+        <div class="response-stats"><span><b id="word-count">0</b> words · <b id="sentence-count">0</b> sentences</span><span id="save-status">Draft saved on this device</span></div>
+        <div class="bell-checklist"><label><input type="checkbox" id="check-answer"> I answered every part.</label><label><input type="checkbox" id="check-evidence"> I used a detail or example.</label><label><input type="checkbox" id="check-revise"> I reread and improved my work.</label></div>
+        <div class="submit-row"><label>Confidence<select id="confidence"><option value="">Choose</option><option value="1">1 · I need help</option><option value="2">2 · Getting started</option><option value="3">3 · Mostly understand</option><option value="4">4 · I can explain it</option></select></label><button id="submit-bellwork">Submit to Mrs. Baker</button></div>
+        <p id="submission-message" role="status"></p>
+        <details class="history"><summary>My submitted bell work <span id="history-count">0</span></summary><div id="bell-history-list"></div></details>
+      </article>
     </section>
 
-    <section class="dashboard" id="dashboard">
-      <div class="section-heading"><div><p class="eyebrow rose">Classroom dashboard</p><h2>First things first.</h2></div><p>Sign in, complete today’s bell work, review it, and submit it to Mrs. Baker. Drafts save automatically.</p></div>
-      <div class="dashboard-grid">
-        <article class="bellwork-card">
-          <div class="card-top"><div><span class="status-dot"></span> Today’s Bell Work <span class="bell-date" id="bell-date"></span></div><div class="timer" aria-live="polite"><b id="timer-display">05:00</b><button id="timer-button">Start</button><button id="timer-reset" aria-label="Reset timer">↺</button></div></div>
-          <div class="bell-progress" aria-label="Bell work steps"><span class="active">1 Read</span><span>2 Write</span><span>3 Check</span><span>4 Submit</span></div>
-          <p class="prompt-label" id="bell-label">ELA.6.R.1.1 · Literary Elements</p>
-          <h3 id="bell-prompt">Think of a character from a story you know. What is one choice the character makes, and how does that choice affect what happens next?</h3>
-          <div class="response-goal"><span>Goal: <b id="response-goal">4–6 complete sentences</b></span><span id="draft-owner">Private device draft</span></div>
-          <textarea id="bell-response" rows="8" placeholder="Write your response here. Explain your thinking and include a specific example." aria-label="Bell work response"></textarea>
-          <div class="writing-meter"><span id="writing-meter-fill"></span></div>
-          <div class="response-tools"><span><b id="word-count">0</b> words · <b id="sentence-count">0</b> sentences · <i id="save-status">Ready</i></span><div><button id="clear-response">Clear</button><button id="new-bellwork">Practice prompt</button></div></div>
-          <details><summary>Need a sentence starter?</summary><p id="sentence-starter">The character’s choice to ___ affects the story because ___.</p></details>
-          <div class="bell-checklist"><p><b>Before you submit</b> <span id="check-summary">0 of 3 ready</span></p><label><input type="checkbox" id="check-answer"> I answered every part of the prompt.</label><label><input type="checkbox" id="check-evidence"> I included a specific detail or example.</label><label><input type="checkbox" id="check-revise"> I reread and fixed at least one thing.</label></div>
-          <div class="bell-submit-row"><label for="confidence">How confident are you?</label><select id="confidence"><option value="">Choose one</option><option value="1">1 · I need help</option><option value="2">2 · I’m getting started</option><option value="3">3 · I mostly understand</option><option value="4">4 · I can explain it</option></select><button class="submit-bellwork" id="submit-bellwork" type="button">Submit to Mrs. Baker</button></div>
-          <p class="submission-message" id="submission-message" role="status">Sign in to submit. You can still draft on this device.</p>
-          <details class="bell-history"><summary>My recent bell work <span id="history-count">0</span></summary><div id="bell-history-list"><p>Sign in to see submitted work from any device.</p></div></details>
+    <section class="view" id="view-fast">
+      <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Florida Assessment of Student Thinking</p><h1>FAST Challenge</h1><p>Short, original Grade 6 practice aligned to Florida B.E.S.T. reading skills.</p></div>
+      <div class="game-stats"><article><small>Score</small><b id="fast-score">0</b></article><article><small>Streak</small><b id="fast-streak">0</b></article><article><small>Questions</small><b id="fast-count">0</b></article><article><small>Best skill</small><b id="fast-best">Start playing</b></article></div>
+      <div class="fast-shell">
+        <article class="question-card">
+          <div class="question-meta"><span id="fast-category"></span><b id="fast-standard"></b><button id="fast-reset">Reset game</button></div>
+          <div class="passage" id="fast-passage"></div>
+          <h2 id="fast-question"></h2>
+          <div class="answer-list" id="fast-answers"></div>
+          <div class="fast-feedback" id="fast-feedback">Choose the answer that the text supports best.</div>
+          <button class="next-question" id="fast-next" hidden>Next question →</button>
         </article>
-
-        <article class="agenda-card">
-          <div class="agenda-header"><div><p class="eyebrow rose">Class plan</p><h3 id="agenda-date">Today</h3></div><span>Preview</span></div>
-          <div class="agenda-tabs" role="tablist"><button class="active" data-agenda="today">Today</button><button data-agenda="week">This Week</button><button data-agenda="month">This Month</button></div>
-          <div id="agenda-content" class="agenda-content"></div>
-          <p class="teacher-note">Mrs. Baker will replace this preview with live plans once the school year begins.</p>
-        </article>
+        <aside class="strategy-card"><p class="eyebrow">Use this every time</p><h2>Question → Evidence → Choice → Check</h2><ol><li><b>1</b> Name exactly what the question asks.</li><li><b>2</b> Find the sentence or detail that proves it.</li><li><b>3</b> Predict an answer before reading choices.</li><li><b>4</b> Eliminate choices the text does not fully support.</li></ol><p><b>Remember:</b> This is skill practice, not an official FAST test or score predictor.</p></aside>
       </div>
     </section>
 
-    <section class="learning" id="learning">
-      <div class="section-heading"><div><p class="eyebrow rose">StudySync + Florida B.E.S.T.</p><h2>Your Grade 6 learning map</h2></div><p>Choose a strand to see what success looks like, how we practice it, and how it connects to FAST.</p></div>
-      <div class="learning-shell">
-        <div class="learning-nav" role="tablist">
-          <button class="active" data-strand="literature"><span>01</span>Literature</button>
-          <button data-strand="information"><span>02</span>Informational</button>
-          <button data-strand="writing"><span>03</span>Writing</button>
-          <button data-strand="vocabulary"><span>04</span>Vocabulary</button>
-          <button data-strand="communication"><span>05</span>Communication</button>
-        </div>
-        <div class="strand-detail" id="strand-detail"></div>
-      </div>
-      <div class="novel-feature"><div><p class="eyebrow">Planned extended text</p><h3><em>The Outsiders</em></h3><p>Identity, belonging, perspective, character, conflict, and theme. Final timing will follow the confirmed StudySync pacing guide.</p></div><blockquote>“Stay gold” becomes a question about holding onto what matters while the world changes around you.</blockquote></div>
-    </section>
-
-    <section class="fast-center" id="fast">
-      <div class="section-heading light"><div><p class="eyebrow pink">Florida Assessment of Student Thinking</p><h2>FAST practice that teaches you something</h2></div><p>Try a question, explain your evidence, and learn from the feedback. FAST is information for growth, not a label.</p></div>
-      <div class="fast-grid">
-        <article class="practice-card">
-          <div class="practice-meta"><span>Mini practice</span><b>Central idea</b></div>
-          <p class="passage">Before sunrise, volunteers gathered along the beach with buckets and gloves. By noon, they had removed hundreds of pounds of plastic. The cleanup helped wildlife immediately, but organizers said its larger purpose was to show residents how everyday choices travel from streets to the sea.</p>
-          <h3>Which statement best expresses the central idea?</h3>
-          <div class="answers" id="fast-answers">
-            <button data-correct="false"><b>A</b> Beach cleanups should always begin before sunrise.</button>
-            <button data-correct="true"><b>B</b> A cleanup can help now while also changing future behavior.</button>
-            <button data-correct="false"><b>C</b> Most ocean plastic is collected by volunteers.</button>
-            <button data-correct="false"><b>D</b> Wildlife is the only reason people clean beaches.</button>
-          </div>
-          <div id="fast-feedback" class="fast-feedback" aria-live="polite">Choose the answer the whole passage supports.</div>
-        </article>
-        <aside class="fast-routine"><p class="eyebrow pink">A repeatable routine</p><h3>Question → Evidence → Choice → Check</h3><ol><li><b>1</b><span><strong>Name the job</strong>What does the question ask you to find?</span></li><li><b>2</b><span><strong>Find proof</strong>Mark only details connected to that job.</span></li><li><b>3</b><span><strong>Predict first</strong>Say the answer in your own words.</span></li><li><b>4</b><span><strong>Check every choice</strong>Pick the one the text proves completely.</span></li></ol><a href="https://flfast.org/families.html" target="_blank" rel="noreferrer">Official FAST student & family resources ↗</a></aside>
-      </div>
-    </section>
-
-    <section class="toolbox" id="toolbox">
-      <div class="section-heading"><div><p class="eyebrow rose">Use it while you work</p><h2>The ELA Tool Bench</h2></div><p>Not a list of advice: practical language and moves you can use in an assignment right now.</p></div>
-      <div class="tool-tabs" role="tablist"><button class="active" data-tool="evidence">Evidence Builder</button><button data-tool="paragraph">Paragraph Planner</button><button data-tool="vocab">Word Solver</button><button data-tool="discussion">Discussion Stems</button></div>
-      <div id="tool-panel" class="tool-panel"></div>
-    </section>
-
-    <section class="analytics" id="analytics">
-      <div class="section-heading"><div><p class="eyebrow rose">Public assessment snapshot</p><h2>What the numbers can tell us</h2></div><p>Spring 2025 Grade 6 FAST ELA results provide context for our baseline year. Data should guide support, never define a student.</p></div>
-      <div class="metric-grid">
-        <article><span>Florida</span><strong>60%</strong><p>Grade 6 students scoring Level 3 or higher</p></article>
-        <article><span>Manatee County</span><strong>53%</strong><p>Grade 6 students scoring Level 3 or higher</p></article>
-        <article class="baseline"><span>Lake Manatee K-8</span><strong>Baseline year</strong><p>No prior school FAST history; 2026–27 will establish the first trend.</p></article>
-      </div>
-      <div class="data-grid">
-        <article class="distribution-card"><div><h3>Manatee Grade 6 achievement levels</h3><p>Spring 2025 · 3,861 students tested</p></div><div class="stacked-bar" aria-label="Level 1 24 percent, Level 2 23 percent, Level 3 22 percent, Level 4 20 percent, Level 5 12 percent"><span style="--w:24">24%</span><span style="--w:23">23%</span><span style="--w:22">22%</span><span style="--w:20">20%</span><span style="--w:12">12%</span></div><div class="legend"><span>L1</span><span>L2</span><span>L3</span><span>L4</span><span>L5</span></div><p class="takeaway"><b>Our opportunity:</b> 47% of district sixth-graders were in Levels 1–2. Small-group instruction, vocabulary support, and repeated evidence practice directly address that need.</p></article>
-        <article class="growth-card"><p class="eyebrow rose">How to read FAST this year</p><h3>Look for movement, not one moment.</h3><div><span>PM1<small>Starting point</small></span><i>→</i><span>PM2<small>Midyear check</small></span><i>→</i><span>PM3<small>Year-end result</small></span></div><p>Families should ask: Which skills improved? Which need another strategy? Is the student moving toward the next achievement level?</p></article>
-      </div>
-      <details class="data-notes"><summary>Sources, definitions & important context</summary><p>Sources: Florida Department of Education, Spring 2025 FAST Grade 6 ELA district results and 2025 statewide results. Level 3 is considered on-grade-level proficiency for reporting. Percentages may not total exactly 100 because of rounding. Lake Manatee K-8 is a new school, so a prior-school trend is not available.</p><div><a href="https://www.fldoe.org/accountability/assessments/k-12-student-assessment/results/2025.stml" target="_blank" rel="noreferrer">2025 Florida assessment results ↗</a><a href="https://edudata.fldoe.org/" target="_blank" rel="noreferrer">Florida education data portal ↗</a></div></details>
-    </section>
-
-    <section class="habits" id="habits">
-      <div class="section-heading"><div><p class="eyebrow rose">Daily 10-minute leadership lesson</p><h2>The 7 Habits in ELA</h2></div><p>Leadership habits become reading, writing, and collaboration habits.</p></div>
-      <div class="habit-grid"><article><b>01</b><h3>Be Proactive</h3><p>Ask for the support you need.</p></article><article><b>02</b><h3>Begin With the End</h3><p>Know the goal before you begin.</p></article><article><b>03</b><h3>First Things First</h3><p>Do the most important step first.</p></article><article><b>04</b><h3>Think Win-Win</h3><p>Build solutions where everyone learns.</p></article><article><b>05</b><h3>Understand First</h3><p>Listen closely before responding.</p></article><article><b>06</b><h3>Synergize</h3><p>Combine ideas to make stronger work.</p></article><article><b>07</b><h3>Sharpen the Saw</h3><p>Care for your mind and reading life.</p></article></div>
-    </section>
-
-    <section class="resources" id="resources">
-      <div class="section-heading"><div><p class="eyebrow rose">Reference shelf</p><h2>Resources for deeper help</h2></div><p>Useful official and academic links that matter, but do not need to crowd the daily classroom tools.</p></div>
-      <div class="resource-grid">
-        <a href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. ELA Standards</b><span>Official benchmarks, clarifications, and appendices ↗</span></a>
-        <a href="https://www.fldoe.org/file/20102/TDS-FAST-ELA.pdf" target="_blank" rel="noreferrer"><b>Grade 6 FAST ELA Blueprint</b><span>Official assessed benchmarks and reporting categories ↗</span></a>
-        <a href="https://www.manateeschools.net/" target="_blank" rel="noreferrer"><b>Manatee County Schools</b><span>District information and family services ↗</span></a>
-        <a href="https://www.mymanatee.org/departments/manatee_county_public_library_system" target="_blank" rel="noreferrer"><b>Manatee Libraries</b><span>Books, research databases, and digital access ↗</span></a>
-        <a href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank" rel="noreferrer"><b>Purdue Writing Lab</b><span>Writing, grammar, and citation help ↗</span></a>
-        <a href="https://www.studysync.com/" target="_blank" rel="noreferrer"><b>About StudySync</b><span>Information about the core ELA platform ↗</span></a>
-      </div>
+    <section class="view" id="view-explore">
+      <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Learning beyond today's task</p><h1>Explore the ELA Studio</h1><p>Standards, leadership habits, public assessment context, and useful links.</p></div>
+      <div class="explore-tabs"><button class="active" data-panel="learning">B.E.S.T. Map</button><button data-panel="data">Public Data</button><button data-panel="habits">7 Habits</button><button data-panel="resources">Resources</button></div>
+      <div class="explore-panel active" id="panel-learning"><h2>Grade 6 B.E.S.T. learning map</h2><p>Our StudySync lessons build skills across five connected areas.</p><div class="strand-grid"><article><b>Reading Literature</b><span>Character, setting, plot, theme, perspective, and poetry</span></article><article><b>Reading Informational Text</b><span>Central idea, structure, purpose, perspective, and argument</span></article><article><b>Writing</b><span>Argumentative, expository, and narrative communication</span></article><article><b>Vocabulary</b><span>Morphology, context, figurative language, and reference tools</span></article><article><b>Communication</b><span>Discussion, collaboration, presentation, and research</span></article></div><a class="resource-link" href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf#page=79" target="_blank" rel="noreferrer">Official Grade 6 Florida B.E.S.T. ELA standards ↗</a></div>
+      <div class="explore-panel" id="panel-data"><h2>Public Grade 6 FAST context</h2><p>Spring 2025 results provide context, not labels. Lake Manatee K-8 begins its baseline year in 2026–27.</p><div class="data-cards"><article><small>Florida Level 3+</small><b>60%</b></article><article><small>Manatee Level 3+</small><b>53%</b></article><article><small>Manatee students tested</small><b>3,861</b></article><article><small>Lake Manatee</small><b>Baseline year</b></article></div><p class="data-note">Manatee Grade 6 distribution: Level 1 24%, Level 2 23%, Level 3 22%, Level 4 20%, Level 5 12%. Percentages are rounded. PM1 and PM2 are progress-monitoring checkpoints; PM3 is the year-end result.</p></div>
+      <div class="explore-panel" id="panel-habits"><h2>The 7 Habits in ELA</h2><div class="habit-list"><article><b>1</b><span><strong>Be Proactive</strong> Ask for the support you need.</span></article><article><b>2</b><span><strong>Begin With the End in Mind</strong> Know the learning goal before you begin.</span></article><article><b>3</b><span><strong>Put First Things First</strong> Complete the most important step first.</span></article><article><b>4</b><span><strong>Think Win-Win</strong> Build solutions where everyone learns.</span></article><article><b>5</b><span><strong>Seek First to Understand</strong> Listen closely before responding.</span></article><article><b>6</b><span><strong>Synergize</strong> Combine ideas to create stronger work.</span></article><article><b>7</b><span><strong>Sharpen the Saw</strong> Care for your mind and reading life.</span></article></div></div>
+      <div class="explore-panel" id="panel-resources"><h2>Resource shelf</h2><div class="resource-list"><a href="teacher.html"><b>Teacher Dashboard Preview</b><span>See sample bell-work submissions →</span></a><a href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. ELA Standards</b><span>Official benchmarks and clarifications ↗</span></a><a href="https://www.fldoe.org/file/20102/TDS-FAST-ELA.pdf" target="_blank" rel="noreferrer"><b>Grade 6 FAST ELA Blueprint</b><span>Assessed benchmarks and reporting categories ↗</span></a><a href="https://flfast.org/families.html" target="_blank" rel="noreferrer"><b>FAST Family Portal</b><span>Official student and family resources ↗</span></a><a href="https://www.manateeschools.net/" target="_blank" rel="noreferrer"><b>Manatee County Schools</b><span>District information and services ↗</span></a><a href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank" rel="noreferrer"><b>Purdue Writing Lab</b><span>Writing and grammar support ↗</span></a></div></div>
     </section>
   </main>
 
-  <footer><a class="brand" href="#home"><span>TB</span><div><b>Mrs. Baker's</b><small>ELA Studio</small></div></a><p>Lake Manatee K-8 · Grade 6 ELA<br><small>StudySync · Florida B.E.S.T. · 2026–27</small></p><a href="#home">Back to top ↑</a></footer>
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow rose">Mrs. Baker’s ELA Studio</p><h2>Student account</h2><p>Use your school Google account so drafts and submitted bell work follow you between devices.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with school Google</button><p class="privacy-note">Only classroom work and basic account identity are stored. Accounts must be approved by the school before student use.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><label>Class code<input id="class-code" maxlength="12" autocomplete="off" placeholder="Provided by Mrs. Baker"></label><button id="join-class" type="button">Join class</button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script>
-  <script type="module" src="firebase-app.js"></script>
-  <script src="script.js?v=6"></script>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Class account</h2><p>Sign in so bell work is connected to the correct student.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">Use the Google account approved for this class.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><label>Class code<input id="class-code" maxlength="12" autocomplete="off" placeholder="Provided by Mrs. Baker"></label><button id="join-class" type="button">Join class</button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=1"></script>
 </body>
 </html>
-
