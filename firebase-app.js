@@ -41,11 +41,17 @@ if(!config?.projectId){
     const user=auth.currentUser;
     const classCode=document.querySelector('#class-code').value.trim().toUpperCase();
     if(!user||classCode.length<4){feedback.textContent='Enter the class code Mrs. Baker gave you.';return}
-    const current=await getDoc(doc(db,'users',user.uid));
-    const role=current.data()?.role||'student';
-    await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',classCode,role,updatedAt:serverTimestamp()},{merge:true});
-    feedback.textContent=`Joined class ${classCode}.`;
-    publish({ready:true,user,db,classCode,role,api});
+    feedback.textContent='Finishing your account...';
+    try{
+      const current=await getDoc(doc(db,'users',user.uid));
+      const role=current.data()?.role||'student';
+      await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',classCode,role,updatedAt:serverTimestamp()},{merge:true});
+      feedback.textContent=`Ready! You joined class ${classCode}.`;
+      publish({ready:true,user,db,classCode,role,api});
+      setTimeout(()=>dialog.close(),700);
+    }catch(error){
+      feedback.textContent='Google sign-in worked, but the class could not be connected yet. Your account is safe; please try the class code again.';
+    }
   });
   onAuthStateChanged(auth,async user=>{
     signedOut.hidden=Boolean(user);
@@ -60,5 +66,11 @@ if(!config?.projectId){
     document.querySelector('#class-code').value=profile.classCode||'';
     document.querySelector('#teacher-link').hidden=profile.role!=='teacher';
     publish({ready:true,user,db,classCode:profile.classCode||'',role:profile.role||'student',api});
+    if(!profile.classCode){
+      feedback.textContent='Google sign-in worked. Enter Mrs. Baker’s class code to finish setup.';
+      if(!dialog.open)dialog.showModal();
+    }else if(dialog.open){
+      feedback.textContent=`You are ready for class ${profile.classCode}.`;
+    }
   });
 }
