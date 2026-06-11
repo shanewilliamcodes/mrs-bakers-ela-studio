@@ -13,7 +13,7 @@
 .done-answer p{margin:0;line-height:1.7;white-space:pre-wrap}
 .done-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .done-actions button{border:0;border-radius:12px;padding:14px 24px;font-weight:700;cursor:pointer}
-#done-edit{background:var(--deep);color:#fff}
-#done-home{background:var(--blush);color:var(--deep)}
+.done-actions button:first-child{background:var(--deep);color:#fff}
+.done-actions button:last-child{background:var(--blush);color:var(--deep)}
 .bell-done .history{margin-top:28px;text-align:left}
 @media(max-width:560px){.done-actions button{width:100%}}

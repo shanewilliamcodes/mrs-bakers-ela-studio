@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Mrs. Tori Baker's Grade 6 ELA classroom hub at Lake Manatee K-8.">
   <title>Mrs. Baker's Grade 6 ELA Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23742747'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='28' fill='%23fff'%3ETB%3C/text%3E%3C/svg%3E">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mrs. Baker's Grade 6 ELA Studio">
+  <meta property="og:description" content="Bell work, FAST practice, StudySync and Schoology links, and family resources for Mrs. Baker's Grade 6 ELA classes at Lake Manatee K-8.">
+  <meta property="og:url" content="https://shanewilliamcodes.github.io/mrs-bakers-ela-studio/">
+  <meta property="og:image" content="https://shanewilliamcodes.github.io/mrs-bakers-ela-studio/assets/ela-hero-pink.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -12,8 +19,8 @@
   <link rel="stylesheet" href="account.css?v=2">
   <link rel="stylesheet" href="leaderboard.css?v=1">
   <link rel="stylesheet" href="account-fixes.css?v=1">
-  <link rel="stylesheet" href="analytics.css?v=1">
-  <link rel="stylesheet" href="bellwork.css?v=1">
+  <link rel="stylesheet" href="analytics.css?v=2">
+  <link rel="stylesheet" href="bellwork.css?v=2">
 </head>
 <body>
   <header class="topbar">
@@ -62,6 +69,13 @@
         <p id="submission-message" role="status"></p>
         <details class="history"><summary>My past bell work <span class="bell-history-count">0</span></summary><div class="bell-history-list"></div></details>
       </article>
+      <article class="bell-done" id="bellwork-weekend" hidden>
+        <span class="done-check">☀</span>
+        <h2>No bell work on weekends!</h2>
+        <p>Enjoy your weekend — a new prompt will be ready Monday morning. Want some practice anyway? The FAST Challenge is always open.</p>
+        <div class="done-actions"><button data-view="fast">Play the FAST Challenge</button><button id="weekend-home" data-view="home">Back to Launchpad</button></div>
+        <details class="history"><summary>My past bell work <span class="bell-history-count">0</span></summary><div class="bell-history-list"></div></details>
+      </article>
       <article class="bell-done" id="bellwork-done" hidden>
         <span class="done-check">✓</span>
         <h2>Today's bell work is complete!</h2>
@@ -82,7 +96,7 @@
           <div class="passage" id="fast-passage"></div>
           <h2 id="fast-question"></h2>
           <div class="answer-list" id="fast-answers"></div>
-          <div class="fast-feedback" id="fast-feedback">Choose the answer that the text supports best.</div>
+          <div class="fast-feedback" id="fast-feedback" aria-live="polite">Choose the answer that the text supports best.</div>
           <button class="next-question" id="fast-next" hidden>Next question →</button>
         </article>
         <aside class="strategy-card"><p class="eyebrow">Use this every time</p><h2>Question → Evidence → Choice → Check</h2><ol><li><b>1</b> Name exactly what the question asks.</li><li><b>2</b> Find the sentence or detail that proves it.</li><li><b>3</b> Predict an answer before reading choices.</li><li><b>4</b> Eliminate choices the text does not fully support.</li></ol><p><b>Remember:</b> This is skill practice, not an official FAST test or score predictor.</p></aside>
@@ -116,6 +130,6 @@
   </main>
 
   <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="account-ready">Your account is ready.</p><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=5"></script>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=6"></script>
 </body>
 </html>

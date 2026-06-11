@@ -40,3 +40,6 @@
   .level-seg b{font-size:.8rem}
   .legend-name{flex-basis:100%;order:3;margin-top:2px}
 }
+@media(prefers-reduced-motion:reduce){
+  .prof-fill,.level-seg,.launch-card{transition:none}
+}
