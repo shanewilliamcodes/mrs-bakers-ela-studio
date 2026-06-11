@@ -4,14 +4,44 @@ function showView(name){views.forEach(v=>v.classList.toggle('active',v.id===`vie
 document.querySelectorAll('[data-view]').forEach(x=>x.addEventListener('click',e=>{if(x.tagName==='BUTTON')e.preventDefault();showView(x.dataset.view)}));
 const initial=location.hash.slice(1);showView(['bellwork','fast','explore'].includes(initial)?initial:'home');
 
+// Each weekday keeps one skill all year; the prompt rotates weekly through
+// four variants so students never see the same question two weeks in a row.
+// Variant choice is derived from the date, so every student (and the teacher
+// dashboard) sees the same prompt on the same day.
 const dayPlans={
-  1:{name:'Monday · Make a Claim',standard:'ELA.6.R.2.4',label:'Argument',goal:'2–3 complete sentences',prompt:'Should sixth-grade students have a short independent reading period every school day? State a clear claim and support it with two logical reasons.',starter:'Sixth-grade students should/should not ___ because ___.'},
-  2:{name:'Tuesday · Read Between the Lines',standard:'ELA.6.R.1.1',label:'Inference',goal:'2–3 complete sentences',prompt:'A character says, “It does not matter,” but folds the note carefully and places it in a desk drawer. What can you infer about the note? Use two details from the sentence.',starter:'Readers can infer that ___ because the character ___ and ___.'},
-  3:{name:'Wednesday · Word Detective',standard:'ELA.6.V.1.2',label:'Morphology & Context',goal:'2–3 complete sentences',prompt:'In the sentence “The hikers were rejuvenated after resting beside the cool stream,” what does rejuvenated mean? Explain how the word parts or context helped you decide.',starter:'Rejuvenated most likely means ___. The clue ___ helped me because ___.'},
-  4:{name:'Thursday · Explain the Evidence',standard:'ELA.6.R.2.2',label:'Central Idea',goal:'2–3 complete sentences',prompt:'A community garden provides fresh food, gives neighbors a place to work together, and creates habitat for pollinators. What central idea connects these details? Explain how two details develop it.',starter:'The central idea is ___. The details ___ and ___ develop this idea by ___.'},
-  5:{name:'Friday · Reflect & Revise',standard:'ELA.6.C.4.1',label:'Improving Writing',goal:'2–3 complete sentences',prompt:'What reading or writing strategy helped you most this week? Describe when you used it, why it worked, and one way you will improve it next week.',starter:'The strategy that helped me most was ___. It worked when ___ because ___.'}
+  1:{name:'Monday · Make a Claim',standard:'ELA.6.R.2.4',label:'Argument',goal:'2–3 complete sentences',variants:[
+    ['Should sixth graders have a short independent reading time every school day? Make a claim and give one strong reason.','Sixth graders should/should not ___ because ___.'],
+    ['Should phones stay in backpacks during class? Make a claim and support it with one strong reason.','Phones should/should not ___ because ___.'],
+    ['Is it better to read the book or watch the movie version first? Make a claim and give one reason.','It is better to ___ first because ___.'],
+    ['Should our class earn five extra minutes of free time if everyone finishes bell work all week? Make a claim and give one reason.','Our class should/should not ___ because ___.']
+  ]},
+  2:{name:'Tuesday · Read Between the Lines',standard:'ELA.6.R.1.1',label:'Inference',goal:'2–3 complete sentences',variants:[
+    ['A character says, “It does not matter,” but folds the note carefully and places it in a desk drawer. What can you infer about the note? Use a detail from the sentence.','Readers can infer that ___ because the character ___.'],
+    ['A student walks in smiling and holds a wrinkled test paper high in the air. What can you infer happened? Use one detail.','I can infer that ___ because ___.'],
+    ['The dog sits by the front door with its leash in its mouth. What does the dog want? How do you know?','The dog wants ___ because ___.'],
+    ['Maria checks the clock every minute and taps her foot. What can you infer about how she feels? Use one detail.','Maria probably feels ___ because ___.']
+  ]},
+  3:{name:'Wednesday · Word Detective',standard:'ELA.6.V.1.2',label:'Morphology & Context',goal:'2–3 complete sentences',variants:[
+    ['In the sentence “The hikers were rejuvenated after resting beside the cool stream,” what does rejuvenated mean? What clue helped you decide?','Rejuvenated most likely means ___. The clue ___ helped me because ___.'],
+    ['“The unbreakable mug fell off the table but did not crack.” What does unbreakable mean? Which word parts helped you figure it out?','Unbreakable means ___. The word parts ___ helped me because ___.'],
+    ['“The crowd was so silent you could hear a pin drop.” What does “hear a pin drop” mean here? How do you know?','“Hear a pin drop” means ___ because ___.'],
+    ['“She reread the confusing page slowly.” What does reread mean? How does the prefix re- help you know?','Reread means ___. The prefix re- means ___.']
+  ]},
+  4:{name:'Thursday · Explain the Evidence',standard:'ELA.6.R.2.2',label:'Central Idea',goal:'2–3 complete sentences',variants:[
+    ['A community garden provides fresh food, gives neighbors a place to work together, and creates habitat for pollinators. What central idea connects these details?','The central idea is ___. The details show ___.'],
+    ['School librarians repair old books, order new ones, and help students find stories they will love. What central idea connects these details?','The central idea is ___. The details show ___.'],
+    ['Bees pollinate crops, make honey, and help flowers grow. What central idea do these details support?','The central idea is ___ because ___.'],
+    ['A good teammate passes the ball, cheers for others, and practices hard. What central idea connects these details?','The central idea is ___. One detail that shows it is ___.']
+  ]},
+  5:{name:'Friday · Reflect & Revise',standard:'ELA.6.C.4.1',label:'Improving Writing',goal:'2–3 complete sentences',variants:[
+    ['What reading or writing strategy helped you most this week? When did you use it, and why did it work?','The strategy that helped me most was ___. It worked when ___.'],
+    ['What was the hardest thing you read or wrote this week? What made it hard, and what helped?','The hardest thing was ___. What helped me was ___.'],
+    ['Pick one answer you wrote this week. How would you make it stronger if you wrote it again?','I would make it stronger by ___.'],
+    ['What is one new word you learned this week? What does it mean, and where might you use it?','One word I learned is ___. It means ___.']
+  ]}
 };
-function planForToday(){const day=new Date().getDay();return dayPlans[day]||dayPlans[1]}
+const weekIndex=Math.floor(Date.now()/6048e5);
+function planForToday(){const base=dayPlans[new Date().getDay()]||dayPlans[1];const[prompt,starter]=base.variants[weekIndex%base.variants.length];return{...base,prompt,starter}}
 const plan=planForToday(),todayKey=new Date().toLocaleDateString('en-CA'),response=document.querySelector('#bell-response');
 document.querySelector('#home-focus').textContent=[0,6].includes(new Date().getDay())?'No bell work on weekends — a new prompt arrives Monday morning.':plan.prompt;
 document.querySelector('#bell-day-type').textContent=plan.name;document.querySelector('#bell-prompt').textContent=plan.prompt;document.querySelector('#bell-label').textContent=`${plan.standard} · ${plan.label}`;document.querySelector('#response-goal').textContent=plan.goal;document.querySelector('#sentence-starter').textContent=plan.starter;document.querySelector('#bell-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
