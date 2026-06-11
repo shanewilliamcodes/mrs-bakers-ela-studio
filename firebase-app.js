@@ -50,31 +50,49 @@ if(!config?.projectId){
     }
   });
   document.querySelector('#sign-out').addEventListener('click',()=>signOut(auth));
+  let currentUser=null,currentRole='student',currentPeriod=null;
+  const periodSetup=document.querySelector('#period-setup'),periodDisplay=document.querySelector('#period-display');
+  const refreshPeriodUI=()=>{periodSetup.hidden=Boolean(currentPeriod);periodDisplay.hidden=!currentPeriod;periodDisplay.textContent=currentPeriod?`Period ${currentPeriod} · change`:''};
+  document.querySelector('#save-period').addEventListener('click',async()=>{
+    const v=document.querySelector('#period-select').value;
+    if(!v||!currentUser){feedback.textContent='Choose your class period from the list first.';return}
+    try{
+      await setDoc(doc(db,'users',currentUser.uid),{period:Number(v)},{merge:true});
+      currentPeriod=Number(v);refreshPeriodUI();
+      publish({ready:true,user:currentUser,db,role:currentRole,period:currentPeriod,api});
+      feedback.textContent='Period saved. You are all set!';
+      if(dialog.open)setTimeout(()=>dialog.close(),700);
+    }catch(e){feedback.textContent='Your period did not save. Please try again.'}
+  });
+  periodDisplay.addEventListener('click',()=>{periodSetup.hidden=false});
   onAuthStateChanged(auth,async user=>{
     signedOut.hidden=Boolean(user);
     signedIn.hidden=!user;
     button.textContent=user?(user.displayName?.split(' ')[0]||'My account'):'Student sign in';
-    if(!user){publish({ready:true,user:null,db,api});return}
+    currentUser=user;
+    if(!user){currentPeriod=null;publish({ready:true,user:null,db,api});return}
     document.querySelector('#profile-name').textContent=user.displayName||'Student';
     document.querySelector('#profile-email').textContent=user.email||'';
     document.querySelector('#profile-initial').textContent=(user.displayName||'S')[0].toUpperCase();
     // Unlock the page as soon as Google sign-in succeeds. Reading/creating the Firestore
     // profile is best-effort: if it fails (e.g. rules not yet deployed) it must NOT lock the
     // student out of viewing bell work / the FAST challenge.
-    let role='student';
+    let role='student',period=null;
     try{
       const profileSnap=await getDoc(doc(db,'users',user.uid));
       if(profileSnap.exists()){
         role=profileSnap.data()?.role||'student';
+        period=profileSnap.data()?.period||null;
       }else{
         await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',role:'student',updatedAt:serverTimestamp()});
       }
     }catch(error){
       console.warn('Profile sync deferred (sign-in still succeeded):',error?.code||error);
     }
+    currentRole=role;currentPeriod=period;refreshPeriodUI();
     document.querySelector('#teacher-link').hidden=role!=='teacher';
-    publish({ready:true,user,db,role,api});
-    feedback.textContent='Signed in. Your account is ready.';
-    if(dialog.open)setTimeout(()=>dialog.close(),600);
+    publish({ready:true,user,db,role,period,api});
+    feedback.textContent=period?'Signed in. Your account is ready.':'One last step: choose your class period below.';
+    if(dialog.open&&(period||role==='teacher'))setTimeout(()=>dialog.close(),600);
   });
 }

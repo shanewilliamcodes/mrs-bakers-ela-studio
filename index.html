@@ -12,14 +12,16 @@
   <meta property="og:url" content="https://shanewilliamcodes.github.io/mrs-bakers-ela-studio/">
   <meta property="og:image" content="https://shanewilliamcodes.github.io/mrs-bakers-ela-studio/assets/ela-hero-pink.png">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#742747">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css?v=1">
-  <link rel="stylesheet" href="account.css?v=3">
+  <link rel="stylesheet" href="account.css?v=4">
   <link rel="stylesheet" href="leaderboard.css?v=2">
-  <link rel="stylesheet" href="analytics.css?v=2">
-  <link rel="stylesheet" href="bellwork.css?v=2">
+  <link rel="stylesheet" href="analytics.css?v=3">
+  <link rel="stylesheet" href="bellwork.css?v=3">
 </head>
 <body>
   <header class="topbar">
@@ -49,6 +51,7 @@
         <a class="launch-card" href="syllabus.html"><span class="card-icon syllabus">ELA</span><div><small>Course guide</small><h2>Syllabus</h2><p>Expectations, grading, routines, and family information.</p></div><b>View →</b></a>
         <button class="launch-card secondary" data-view="explore"><span class="card-icon">+</span><div><small>More from class</small><h2>Explore</h2><p>B.E.S.T. learning map, public data, 7 Habits, and resources.</p></div><b>Browse →</b></button>
       </div>
+      <div class="home-note announcement" id="announcement" hidden><b>📣 From Mrs. Baker</b><span></span></div>
       <div class="home-note"><b>Today's focus</b><span id="home-focus">Build a claim and support it with clear evidence.</span><button id="home-note-btn" data-view="bellwork">Begin bell work</button></div>
     </section>
 
@@ -78,6 +81,7 @@
       <article class="bell-done" id="bellwork-done" hidden>
         <span class="done-check">✓</span>
         <h2>Today's bell work is complete!</h2>
+        <p class="bell-streak" id="done-streak" hidden></p>
         <p>Nice work — your answer was sent to Mrs. Baker. You can come back any time today to view or edit it.</p>
         <div class="done-answer"><small id="done-meta"></small><p id="done-response"></p></div>
         <div class="done-actions"><button id="done-edit">Edit my answer</button><button id="done-home" data-view="home">Back to Launchpad</button></div>
@@ -100,6 +104,7 @@
         </article>
         <aside class="strategy-card"><p class="eyebrow">Use this every time</p><h2>Question → Evidence → Choice → Check</h2><ol><li><b>1</b> Name exactly what the question asks.</li><li><b>2</b> Find the sentence or detail that proves it.</li><li><b>3</b> Predict an answer before reading choices.</li><li><b>4</b> Eliminate choices the text does not fully support.</li></ol><p><b>Remember:</b> This is skill practice, not an official FAST test or score predictor.</p></aside>
       </div>
+      <section class="skills-card"><div class="ana-head"><b>My skill tracker</b><span>Accuracy by question type, saved on this device</span></div><ul class="skill-list" id="skill-list"><li class="skill-empty">Answer questions to see your skill levels grow.</li></ul></section>
       </div>
       <section class="leaderboard"><div><p class="eyebrow">Celebrate persistence</p><h2>FAST Streak Spotlight</h2><p>Only the ten strongest personal streaks appear. Every signed-in student joins automatically.</p></div><ol id="leaderboard-list"><li class="leaderboard-empty">Sign in and play to start our class leaderboard.</li></ol><p class="leaderboard-note">Privacy: first name and last initial only. Scores and lower rankings are never shown.</p></section>
     </section>
@@ -129,7 +134,7 @@
     </section>
   </main>
 
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="account-ready">Your account is ready.</p><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=7"></script>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><div class="period-setup" id="period-setup" hidden><label for="period-select">Which class period are you in?</label><select id="period-select"><option value="">Choose your period</option><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select><button id="save-period" type="button">Save my period</button></div><button class="text-button period-display" id="period-display" type="button" hidden></button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=2"></script><script src="app.js?v=8"></script>
 </body>
 </html>

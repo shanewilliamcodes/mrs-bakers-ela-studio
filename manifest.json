@@ -1,0 +1,13 @@
+{
+  "name": "Mrs. Baker's Grade 6 ELA Studio",
+  "short_name": "ELA Studio",
+  "description": "Bell work, FAST practice, and classroom links for Mrs. Baker's Grade 6 ELA classes at Lake Manatee K-8.",
+  "start_url": "/mrs-bakers-ela-studio/",
+  "scope": "/mrs-bakers-ela-studio/",
+  "display": "standalone",
+  "background_color": "#fffafc",
+  "theme_color": "#742747",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

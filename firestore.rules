@@ -22,15 +22,25 @@ service cloud.firestore {
       // A student may fix only TODAY's entry: same owner, unchanged date and
       // original submit time, within 18h of first submitting, and the edit must
       // be timestamped so the teacher can see it was changed.
-      allow update: if signedIn()
+      allow update: if (signedIn()
         && resource.data.studentUid == request.auth.uid
         && request.resource.data.studentUid == request.auth.uid
         && request.resource.data.status == 'submitted'
         && request.resource.data.date == resource.data.date
         && request.resource.data.submittedAt == resource.data.submittedAt
         && request.time < resource.data.submittedAt + duration.value(18, 'h')
-        && request.resource.data.editedAt == request.time;
+        && request.resource.data.editedAt == request.time)
+        // Teachers may add review marks but cannot alter the student's work.
+        || (isTeacher()
+        && request.resource.data.studentUid == resource.data.studentUid
+        && request.resource.data.response == resource.data.response
+        && request.resource.data.date == resource.data.date);
       allow delete: if isTeacher();
+    }
+    // Teacher-published settings (today's prompt override, announcements).
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isTeacher();
     }
     match /leaderboard/{uid} {
       allow read: if true;

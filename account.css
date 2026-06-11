@@ -15,5 +15,10 @@
 .profile-row b,.profile-row small{display:block}
 .profile-row small{color:var(--muted)}
 .account-ready{color:var(--muted)}
+.period-setup{margin:6px 0 14px;padding:16px;background:var(--blush);border-radius:14px}
+.period-setup label{display:block;font-weight:700;margin-bottom:8px}
+.period-setup select{display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:10px;font:inherit}
+.period-setup button{display:block;width:100%;min-height:44px;border:0;border-radius:10px;background:var(--deep);color:#fff;font-weight:700;cursor:pointer}
+.period-display{text-align:center}
 .text-button{border:0;background:none;color:var(--deep);padding:13px;width:100%;cursor:pointer;font-weight:700}
 .teacher-link{margin-top:10px;background:var(--pink)}
