@@ -36,14 +36,14 @@
         <p>Choose a destination and get started. The most-used classroom tools are always one click away.</p>
       </div>
       <div class="launch-grid">
-        <button class="launch-card featured" data-view="bellwork"><span class="card-icon">BW</span><div><small>Start here</small><h2>Today's Bell Work</h2><p>Sign in, respond, review, and submit directly to Mrs. Baker.</p></div><b>Open →</b></button>
+        <button class="launch-card featured" id="bell-launch" data-view="bellwork"><span class="card-icon">BW</span><div><small id="bell-launch-tag">Start here</small><h2>Today's Bell Work</h2><p>Sign in, respond, review, and submit directly to Mrs. Baker.</p></div><b id="bell-launch-cta">Open →</b></button>
         <a class="launch-card" href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="card-icon schoology">S</span><div><small>Daily class work</small><h2>Schoology</h2><p>Assignments, announcements, grades, and updates.</p></div><b>Launch ↗</b></a>
         <a class="launch-card" href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="card-icon studysync">SS</span><div><small>ELA curriculum</small><h2>StudySync</h2><p>Texts, lessons, annotations, and writing assignments.</p></div><b>Launch ↗</b></a>
         <button class="launch-card fast-card" data-view="fast"><span class="card-icon">F</span><div><small>Practice anytime</small><h2>FAST Challenge</h2><p>Original Grade 6 practice with feedback, streaks, and skill tracking.</p></div><b>Play →</b></button>
         <a class="launch-card" href="syllabus.html"><span class="card-icon syllabus">ELA</span><div><small>Course guide</small><h2>Syllabus</h2><p>Expectations, grading, routines, and family information.</p></div><b>View →</b></a>
         <button class="launch-card secondary" data-view="explore"><span class="card-icon">+</span><div><small>More from class</small><h2>Explore</h2><p>B.E.S.T. learning map, public data, 7 Habits, and resources.</p></div><b>Browse →</b></button>
       </div>
-      <div class="home-note"><b>Today's focus</b><span id="home-focus">Build a claim and support it with clear evidence.</span><button data-view="bellwork">Begin bell work</button></div>
+      <div class="home-note"><b>Today's focus</b><span id="home-focus">Build a claim and support it with clear evidence.</span><button id="home-note-btn" data-view="bellwork">Begin bell work</button></div>
     </section>
 
     <section class="view" id="view-bellwork">
@@ -116,6 +116,6 @@
   </main>
 
   <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="account-ready">Your account is ready.</p><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=4"></script>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js"></script><script src="app.js?v=5"></script>
 </body>
 </html>

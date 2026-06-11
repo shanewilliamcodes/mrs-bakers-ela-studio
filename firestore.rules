@@ -16,13 +16,20 @@ service cloud.firestore {
     match /bellwork/{submissionId} {
       allow create: if signedIn()
         && request.resource.data.studentUid == request.auth.uid
-        && request.resource.data.status == 'submitted';
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.submittedAt == request.time;
       allow read: if signedIn() && (resource.data.studentUid == request.auth.uid || isTeacher());
-      // A student may edit their own same-day entry; ownership cannot change.
+      // A student may fix only TODAY's entry: same owner, unchanged date and
+      // original submit time, within 18h of first submitting, and the edit must
+      // be timestamped so the teacher can see it was changed.
       allow update: if signedIn()
         && resource.data.studentUid == request.auth.uid
         && request.resource.data.studentUid == request.auth.uid
-        && request.resource.data.status == 'submitted';
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.date == resource.data.date
+        && request.resource.data.submittedAt == resource.data.submittedAt
+        && request.time < resource.data.submittedAt + duration.value(18, 'h')
+        && request.resource.data.editedAt == request.time;
       allow delete: if isTeacher();
     }
     match /leaderboard/{uid} {
