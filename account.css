@@ -5,10 +5,10 @@
 .account-panel h2{font-size:2.1rem;margin:.3em 0}
 .account-panel>p{line-height:1.6;color:var(--muted)}
 .dialog-close{position:absolute;right:15px;top:12px;border:0;background:none;font-size:28px;color:var(--muted);cursor:pointer}
-.google-signin,.signed-in-state>button:not(.text-button),.teacher-link{display:block;width:100%;min-height:48px;border:0;border-radius:12px;background:var(--deep);color:#fff;padding:14px;text-align:center;text-decoration:none;font-weight:700;cursor:pointer}
-.google-signin:hover,.signed-in-state>button:not(.text-button):hover{background:#5c1e38}
-.google-signin:focus-visible{outline:3px solid #f3a9c3;outline-offset:3px}
-.google-signin:disabled{opacity:.5;cursor:not-allowed}
+.ms-signin,.signed-in-state>button:not(.text-button),.teacher-link{display:block;width:100%;min-height:48px;border:0;border-radius:12px;background:var(--deep);color:#fff;padding:14px;text-align:center;text-decoration:none;font-weight:700;cursor:pointer}
+.ms-signin:hover,.signed-in-state>button:not(.text-button):hover{background:#5c1e38}
+.ms-signin:focus-visible{outline:3px solid #f3a9c3;outline-offset:3px}
+.ms-signin:disabled{opacity:.5;cursor:not-allowed}
 .privacy-note,.account-feedback{font-size:.8rem;color:var(--muted)}
 .profile-row{display:flex;align-items:center;gap:12px;margin:20px 0}
 .profile-row>span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--pink);color:#fff;font:700 18px Fraunces,serif}

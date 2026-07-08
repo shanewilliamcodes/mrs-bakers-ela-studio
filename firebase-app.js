@@ -1,44 +1,63 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {browserLocalPersistence,getAuth,getRedirectResult,GoogleAuthProvider,onAuthStateChanged,setPersistence,signInWithPopup,signInWithRedirect,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {browserLocalPersistence,getAuth,getRedirectResult,OAuthProvider,onAuthStateChanged,setPersistence,signInWithPopup,signInWithRedirect,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {addDoc,collection,doc,getDoc,getDocs,getFirestore,limit,orderBy,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
+// Set MS_TENANT to the district's Entra tenant ID once known to lock sign-in
+// to district accounts and make silent SSO more likely. Empty = any Microsoft org.
+const MS_TENANT='';
+const MS_DOMAIN_HINT='';
 const config=window.BAKER_FIREBASE_CONFIG;
 const button=document.querySelector('#account-button');
 const dialog=document.querySelector('#account-dialog');
 const feedback=document.querySelector('#account-feedback');
 const signedOut=document.querySelector('#account-state');
 const signedIn=document.querySelector('#signed-in-state');
+const signinButton=document.querySelector('#ms-signin');
 const publish=detail=>window.dispatchEvent(new CustomEvent('baker-auth-change',{detail}));
-const api={addDoc,collection,doc,getDoc,getDocs,limit,orderBy,query,serverTimestamp,setDoc,where};
+function normalizeName(raw){
+  let name=String(raw||'Student').replace(/\s*[\[(].*?[\])]\s*/g,' ').replace(/\s+/g,' ').trim()||'Student';
+  const comma=name.match(/^([^,]+),\s*(.+)$/);
+  if(comma)name=`${comma[2]} ${comma[1]}`.replace(/\s+/g,' ').trim();
+  return name||'Student';
+}
+const api={addDoc,collection,doc,getDoc,getDocs,limit,orderBy,query,serverTimestamp,setDoc,where,normalizeName};
 
 button.addEventListener('click',()=>dialog.showModal());
 
 if(!config?.projectId){
   button.textContent='Accounts coming soon';
-  document.querySelector('#google-signin').disabled=true;
+  signinButton.disabled=true;
   feedback.textContent='Secure account storage is being connected. Bell-work drafts still save privately on this device.';
-  publish({ready:false,user:null});
+  publish({ready:false,user:null,api});
 }else{
   const app=initializeApp(config);
   const auth=getAuth(app);
   const db=getFirestore(app);
-  const provider=new GoogleAuthProvider();
-  provider.setCustomParameters({prompt:'select_account'});
+  const provider=new OAuthProvider('microsoft.com');
+  provider.setCustomParameters({
+    prompt:'select_account',
+    ...(MS_TENANT?{tenant:MS_TENANT}:{}),
+    ...(MS_DOMAIN_HINT?{domain_hint:MS_DOMAIN_HINT}:{})
+  });
   setPersistence(auth,browserLocalPersistence).catch(()=>{});
 
+  const authText=error=>`${error?.code||''} ${error?.message||''} ${JSON.stringify(error?.customData||{})}`;
   const authMessage=error=>{
-    if(error?.code==='auth/popup-closed-by-user')return 'The Google sign-in window closed before it finished. If Google showed an "Access blocked" message, your school account may not be allowed to sign in to outside sites — please tell Mrs. Baker. Otherwise click Continue with Google to try again.';
+    const text=authText(error);
+    if(/AADSTS(65001|650052|900941)/.test(text))return "Your school district hasn't approved this website for student sign-in yet. Please tell Mrs. Baker — this is a district setting, not a mistake you made.";
+    if(/AADSTS50020/.test(text))return "That Microsoft account isn't part of the school district. Use your school email account.";
+    if(error?.code==='auth/popup-closed-by-user')return 'The Microsoft sign-in window closed before it finished. Click Sign in to try again, or tell Mrs. Baker if the window showed an error.';
+    if(error?.code==='auth/account-exists-with-different-credential')return 'This email was already used with a different sign-in method. Tell Mrs. Baker so she can fix your account.';
     if(error?.code==='auth/admin-restricted-operation'||error?.code==='auth/user-disabled')return 'Your school may not allow this account to sign in to outside websites. Please ask Mrs. Baker — she can check with the district.';
     if(error?.code==='auth/unauthorized-domain')return 'This website address still needs to be approved in Firebase. Please tell Mrs. Baker the sign-in domain is not authorized.';
-    if(error?.code==='auth/operation-not-allowed')return 'Google sign-in has not been enabled for this class yet.';
-    if(error?.code==='auth/network-request-failed')return 'The network blocked Google sign-in. Check the connection and try again.';
-    return `Google sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}. Please try once more, or tell Mrs. Baker if it keeps happening.`;
+    if(error?.code==='auth/operation-not-allowed')return 'Microsoft sign-in has not been enabled for this class yet.';
+    if(error?.code==='auth/network-request-failed')return 'The network blocked school account sign-in. Check the connection and try again.';
+    return `School account sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}. Please try once more, or tell Mrs. Baker if it keeps happening.`;
   };
-  // The redirect fallback (used when popups are blocked) returns here after the page reloads.
-  // Surface any error so a blocked-by-district account isn't a silent failure.
+
   getRedirectResult(auth).catch(error=>{feedback.textContent=authMessage(error)});
-  document.querySelector('#google-signin').addEventListener('click',async()=>{
-    feedback.textContent='Opening Google sign-in...';
+  signinButton.addEventListener('click',async()=>{
+    feedback.textContent='Opening school account sign-in...';
     try{
       await setPersistence(auth,browserLocalPersistence);
       await signInWithPopup(auth,provider);
@@ -57,7 +76,7 @@ if(!config?.projectId){
     const v=document.querySelector('#period-select').value;
     if(!v||!currentUser){feedback.textContent='Choose your class period from the list first.';return}
     try{
-      await setDoc(doc(db,'users',currentUser.uid),{period:Number(v)},{merge:true});
+      await setDoc(doc(db,'users',currentUser.uid),{period:Number(v),updatedAt:serverTimestamp()},{merge:true});
       currentPeriod=Number(v);refreshPeriodUI();
       publish({ready:true,user:currentUser,db,role:currentRole,period:currentPeriod,api});
       feedback.textContent='Period saved. You are all set!';
@@ -68,30 +87,40 @@ if(!config?.projectId){
   onAuthStateChanged(auth,async user=>{
     signedOut.hidden=Boolean(user);
     signedIn.hidden=!user;
-    button.textContent=user?(user.displayName?.split(' ')[0]||'My account'):'Student sign in';
-    currentUser=user;
-    if(!user){currentPeriod=null;publish({ready:true,user:null,db,api});return}
-    document.querySelector('#profile-name').textContent=user.displayName||'Student';
+    currentUser=null;
+    if(!user){
+      button.textContent='Student sign in';
+      currentPeriod=null;
+      publish({ready:true,user:null,db,api});
+      return;
+    }
+    const displayName=normalizeName(user.displayName||user.email?.split('@')[0]||'Student');
+    const publicUser={uid:user.uid,email:user.email||'',displayName};
+    button.textContent=displayName.split(/\s+/)[0]||'My account';
+    currentUser=publicUser;
+    document.querySelector('#profile-name').textContent=displayName;
     document.querySelector('#profile-email').textContent=user.email||'';
-    document.querySelector('#profile-initial').textContent=(user.displayName||'S')[0].toUpperCase();
-    // Unlock the page as soon as Google sign-in succeeds. Reading/creating the Firestore
-    // profile is best-effort: if it fails (e.g. rules not yet deployed) it must NOT lock the
-    // student out of viewing bell work / the FAST challenge.
+    document.querySelector('#profile-initial').textContent=displayName[0].toUpperCase();
+
+    // Unlock the page as soon as Microsoft sign-in succeeds. Reading/creating
+    // the Firestore profile is best-effort so a rules hiccup never blocks practice.
     let role='student',period=null;
     try{
       const profileSnap=await getDoc(doc(db,'users',user.uid));
       if(profileSnap.exists()){
-        role=profileSnap.data()?.role||'student';
-        period=profileSnap.data()?.period||null;
+        const profile=profileSnap.data();
+        role=profile?.role||'student';
+        period=profile?.period||null;
+        if(profile?.displayName!==displayName)await setDoc(doc(db,'users',user.uid),{displayName,email:user.email||'',updatedAt:serverTimestamp()},{merge:true});
       }else{
-        await setDoc(doc(db,'users',user.uid),{displayName:user.displayName||'Student',email:user.email||'',role:'student',updatedAt:serverTimestamp()});
+        await setDoc(doc(db,'users',user.uid),{displayName,email:user.email||'',role:'student',updatedAt:serverTimestamp()});
       }
     }catch(error){
       console.warn('Profile sync deferred (sign-in still succeeded):',error?.code||error);
     }
     currentRole=role;currentPeriod=period;refreshPeriodUI();
     document.querySelector('#teacher-link').hidden=role!=='teacher';
-    publish({ready:true,user,db,role,period,api});
+    publish({ready:true,user:publicUser,db,role,period,api});
     feedback.textContent=period?'Signed in. Your account is ready.':'One last step: choose your class period below.';
     if(dialog.open&&(period||role==='teacher'))setTimeout(()=>dialog.close(),600);
   });

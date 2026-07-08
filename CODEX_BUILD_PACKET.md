@@ -50,17 +50,17 @@ Codex: skip this section; it's listed so the code you write in Phases 2–3 matc
 
 ---
 
-## Phase 1 — Rename: "ELA Studio" → "Mrs. Baker's Classroom · Grade 6 ELA"
+## Phase 1 — Rename: legacy brand → "Mrs. Baker's Classroom · Grade 6 ELA"
 
-Global copy sweep. The brand becomes **"Mrs. Baker's Classroom"** with the qualifier **"Grade 6 ELA"**. Grep for `ELA Studio` and `Studio` to catch everything. Specific targets:
+Global copy sweep. The brand becomes **"Mrs. Baker's Classroom"** with the qualifier **"Grade 6 ELA"**. Grep for the old studio wording and generic studio wording to catch everything. Specific targets:
 
-- `index.html`: `<title>` → `Mrs. Baker's Classroom · Grade 6 ELA`; `og:title`, `og:description`; topbar brand (`<b>Mrs. Baker's</b><small>Grade 6 ELA Studio</small>` → `<b>Mrs. Baker's</b><small>Classroom · Grade 6 ELA</small>`); hero `<h1>Mrs. Baker's<br><em>Grade 6 ELA Studio</em></h1>` → `Mrs. Baker's<br><em>Classroom</em>` with the existing eyebrow line carrying "Grade 6 ELA · Lake Manatee K-8 · 2026–27"; Explore heading "Explore the ELA Studio" → "Explore Mrs. Baker's Classroom"; account dialog eyebrow.
+- `index.html`: `<title>` → `Mrs. Baker's Classroom · Grade 6 ELA`; `og:title`, `og:description`; topbar brand qualifier → `<b>Mrs. Baker's</b><small>Classroom · Grade 6 ELA</small>`; hero → `Mrs. Baker's<br><em>Classroom</em>` with the existing eyebrow line carrying "Grade 6 ELA · Lake Manatee K-8 · 2026–27"; Explore heading → "Explore Mrs. Baker's Classroom"; account dialog eyebrow.
 - `manifest.json`: `name` → `Mrs. Baker's Classroom · Grade 6 ELA`, `short_name` → `Mrs. Baker`, description update.
-- `404.html` `<title>`; `teacher.html` header (keep "Bell Work Dashboard" as the page name); `syllabus.html` any "ELA Studio" mention; `README.md` title + prose.
+- `404.html` `<title>`; `teacher.html` header (keep "Bell Work Dashboard" as the page name); `syllabus.html` any legacy brand mention; `README.md` title + prose.
 - Do NOT rename the Firebase project, Firestore collections, `BAKER_FIREBASE_CONFIG`, or CSS class names — cosmetic copy only.
 - The GitHub repo name stays `mrs-bakers-ela-studio` (renaming breaks nothing but gains nothing; skip).
 
-**Acceptance:** `grep -ri "ela studio" *.html *.json *.md` returns zero user-facing hits.
+**Acceptance:** the legacy brand phrase no longer appears in user-facing `.html`, `.json`, or `.md` content.
 
 ---
 
@@ -113,7 +113,7 @@ This forwards old bookmarks (including `#bellwork` deep links) and is inert on V
 Goal: a student on a school computer (already signed into their district Microsoft 365 account in the browser) clicks **Sign in** → Microsoft account picker shows their account already listed (or silently signs in on domain-joined Edge) → one click → done. No passwords typed on our site, ever.
 
 **3.1 `firebase-app.js` — provider swap.**
-- Import `OAuthProvider` (drop `GoogleAuthProvider`).
+- Import `OAuthProvider` and remove the previous provider import.
 - `const provider = new OAuthProvider('microsoft.com');`
 - Custom parameters: `provider.setCustomParameters({ prompt: 'select_account', ...(MS_TENANT ? { tenant: MS_TENANT } : {}) })`. Add a `const MS_TENANT = ''` at the top with a comment: *set to the district's Entra tenant ID once known to lock sign-in to district accounts and enable silent SSO; empty = any Microsoft account.* Similarly `const MS_DOMAIN_HINT = ''` → if set, pass `domain_hint` to skip the account picker on district machines.
 - Keep the existing popup-first / redirect-fallback structure exactly as is — it's good. With the Phase 2 proxy + same-origin authDomain, `signInWithRedirect` is now reliable on locked-down browsers, so keep that fallback path.
@@ -129,7 +129,7 @@ Goal: a student on a school computer (already signed into their district Microso
 **3.3 School display names ("Last, First").** District M365 accounts frequently have `displayName` of the form `Baker, Tori` (and sometimes trailing student-ID junk). Add one normalizer in `firebase-app.js` and export it via the published `api` (or duplicate the 3-liner in `app.js`):
 `normalizeName(raw)` → if the string matches `/^([^,]+),\s*(.+)$/`, return `"$2 $1"`; strip anything in parentheses/brackets; collapse whitespace. Use it everywhere `displayName` is consumed: profile card (`#profile-name`, `#profile-initial`, first-name button label), the `users/{uid}` doc's `displayName` field on first-create, bell work `studentName`, and `leaderboardName()` in `app.js`. This matters: the leaderboard's "first name + last initial" privacy format is wrong for comma-style names ("Baker, Tori" would render "Baker T." — full last name leaked).
 
-**3.4 Copy sweep.** All sign-in UI says "school account", never "Google": account dialog ("Use Google once..." → "One click with your school Microsoft account — no password to remember."), `#google-signin` button → id `ms-signin`, label **"Sign in with your school account"**; `updateGate()` in `app.js` hardcodes button text `'Continue with Google'` → `'Sign in with your school account'`; both auth gates' `<small>` hints; `teacher.html` auth box copy.
+**3.4 Copy sweep.** All sign-in UI says "school account", never the previous provider name: account dialog copy → "One click with your school Microsoft account — no password to remember."; old sign-in button id → `ms-signin`, label **"Sign in with your school account"**; `updateGate()` in `app.js` uses `'Sign in with your school account'`; both auth gates' `<small>` hints; `teacher.html` auth box copy.
 
 **3.5 Teacher sign-in.** `teacher.js`: swap to the same Microsoft provider. Keep it to **one** provider on the teacher page too (Mrs. Baker has a district account); Google stays enabled in the Firebase console purely as a temporary escape hatch and gets disabled by Shane once her Microsoft role doc is set (0.5). No dual-button UI.
 
@@ -183,7 +183,7 @@ Ordered by impact:
 5. **`#fast-count` label** — shows `fastIndex` which lags one behind answered questions; increment on answer, not on Next, and label it "Answered".
 6. **Skill tracker is device-local** — fine for now, but add a one-line note in the UI ("saved on this device") — already present; instead persist best-effort to `users/{uid}.skills` (merge) so it follows the student. Optional; skip if time-boxed.
 7. **Accessibility pass** — add a skip-to-content link; `:focus-visible` styles on nav/cards (verify in `app.css`); `prefers-reduced-motion` guard around bar animations in `analytics.css`; confirm the pink-on-white text tokens meet AA (the `--pink` #d94f82-ish on white for small text likely fails — bump to the darker `--deep` for body-size text).
-8. **Dead code** — `skillScores` in the FAST game duplicates `skillStats` ("Best skill" stat); consolidate to one source.
+8. **Dead code** — the old FAST best-skill counter duplicated the persisted skill tracker; consolidate to one source.
 9. **README refresh** — new name, Vercel deploy flow (push to `main` → auto-deploy), Microsoft auth setup summary, updated open-items list.
 
 ---

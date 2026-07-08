@@ -4,28 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Mrs. Tori Baker's Grade 6 ELA classroom hub at Lake Manatee K-8.">
-  <title>Mrs. Baker's Grade 6 ELA Studio</title>
+  <title>Mrs. Baker's Classroom · Grade 6 ELA</title>
+  <script>if(location.hostname.endsWith('github.io'))location.replace('https://mrs-bakers-classroom.vercel.app'+location.pathname.replace('/mrs-bakers-ela-studio','')+location.hash);</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23742747'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='28' fill='%23fff'%3ETB%3C/text%3E%3C/svg%3E">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Mrs. Baker's Grade 6 ELA Studio">
-  <meta property="og:description" content="Bell work, FAST practice, StudySync and Schoology links, and family resources for Mrs. Baker's Grade 6 ELA classes at Lake Manatee K-8.">
-  <meta property="og:url" content="https://shanewilliamcodes.github.io/mrs-bakers-ela-studio/">
-  <meta property="og:image" content="https://shanewilliamcodes.github.io/mrs-bakers-ela-studio/assets/ela-hero-pink.png">
+  <meta property="og:title" content="Mrs. Baker's Classroom · Grade 6 ELA">
+  <meta property="og:description" content="Bell work, FAST practice, StudySync and Schoology links, and family resources for Mrs. Baker's Grade 6 ELA classroom at Lake Manatee K-8.">
+  <meta property="og:url" content="https://mrs-bakers-classroom.vercel.app/">
+  <meta property="og:image" content="https://mrs-bakers-classroom.vercel.app/assets/ela-hero-pink.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#742747">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app.css?v=1">
-  <link rel="stylesheet" href="account.css?v=4">
+  <link rel="stylesheet" href="app.css?v=2">
+  <link rel="stylesheet" href="account.css?v=5">
   <link rel="stylesheet" href="leaderboard.css?v=2">
   <link rel="stylesheet" href="analytics.css?v=3">
   <link rel="stylesheet" href="bellwork.css?v=3">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="topbar">
-    <button class="brand" data-view="home"><span>TB</span><div><b>Mrs. Baker's</b><small>Grade 6 ELA Studio</small></div></button>
+    <button class="brand" data-view="home"><span>TB</span><div><b>Mrs. Baker's</b><small>Classroom · Grade 6 ELA</small></div></button>
     <nav aria-label="Primary navigation">
       <button data-view="home" class="active">Launchpad</button>
       <button data-view="bellwork">Bell Work</button>
@@ -35,11 +37,11 @@
     <button class="account-button" id="account-button" type="button">Student sign in</button>
   </header>
 
-  <main>
+  <main id="main-content">
     <section class="view active" id="view-home">
       <div class="welcome">
-        <p class="eyebrow">Lake Manatee K-8 · 2026–27</p>
-        <h1>Mrs. Baker's<br><em>Grade 6 ELA Studio</em></h1>
+        <p class="eyebrow">Grade 6 ELA · Lake Manatee K-8 · 2026–27</p>
+        <h1>Mrs. Baker's<br><em>Classroom</em></h1>
         <h2>Where do you need to go?</h2>
         <p>Choose a destination and get started. The most-used classroom tools are always one click away.</p>
       </div>
@@ -48,7 +50,7 @@
         <a class="launch-card" href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="card-icon schoology">S</span><div><small>Daily class work</small><h2>Schoology</h2><p>Assignments, announcements, grades, and updates.</p></div><b>Launch ↗</b></a>
         <a class="launch-card" href="https://launchpad.classlink.com/manateeschools" target="_blank" rel="noreferrer"><span class="card-icon studysync">SS</span><div><small>ELA curriculum</small><h2>StudySync</h2><p>Texts, lessons, annotations, and writing assignments.</p></div><b>Launch ↗</b></a>
         <button class="launch-card fast-card" data-view="fast"><span class="card-icon">F</span><div><small>Practice anytime</small><h2>FAST Challenge</h2><p>Original Grade 6 practice with feedback, streaks, and skill tracking.</p></div><b>Play →</b></button>
-        <a class="launch-card" href="syllabus.html"><span class="card-icon syllabus">ELA</span><div><small>Course guide</small><h2>Syllabus</h2><p>Expectations, grading, routines, and family information.</p></div><b>View →</b></a>
+        <a class="launch-card" href="/syllabus"><span class="card-icon syllabus">ELA</span><div><small>Course guide</small><h2>Syllabus</h2><p>Expectations, grading, routines, and family information.</p></div><b>View →</b></a>
         <button class="launch-card secondary" data-view="explore"><span class="card-icon">+</span><div><small>More from class</small><h2>Explore</h2><p>B.E.S.T. learning map, public data, 7 Habits, and resources.</p></div><b>Browse →</b></button>
       </div>
       <div class="home-note announcement" id="announcement" hidden><b>📣 From Mrs. Baker</b><span></span></div>
@@ -58,7 +60,7 @@
     <section class="view" id="view-bellwork">
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Today's work</p><h1>Bell Work</h1><p>A new B.E.S.T.-aligned thinking routine every school day.</p></div>
       <div class="auth-gate" id="bellwork-gate">
-        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Continue with Google</button><small>Use the Google account approved for this class.</small>
+        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Sign in with your school account</button><small>Use your school Microsoft account.</small>
       </div>
       <article class="bell-workspace" id="bellwork-workspace" hidden>
         <div class="bell-header"><div><span id="bell-day-type">Monday · Make a Claim</span><h2 id="bell-prompt">Loading today's prompt...</h2></div><div><small id="bell-date"></small><b id="bell-label"></b></div></div>
@@ -91,8 +93,8 @@
 
     <section class="view" id="view-fast">
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Florida Assessment of Student Thinking</p><h1>FAST Challenge</h1><p>Short, original Grade 6 practice aligned to Florida B.E.S.T. reading skills.</p></div>
-      <div class="auth-gate" id="fast-gate"><span class="lock">✓</span><h2>Sign in to start the challenge</h2><p>Your account keeps your personal best streak connected to you and updates the class Streak Spotlight automatically.</p><button id="fast-signin">Continue with Google</button><small>One click with Google, then start playing.</small></div>
-      <div id="fast-game" hidden><div class="game-stats"><article><small>Score</small><b id="fast-score">0</b></article><article><small>Streak</small><b id="fast-streak">0</b></article><article><small>Questions</small><b id="fast-count">0</b></article><article><small>Best skill</small><b id="fast-best">Start playing</b></article></div>
+      <div class="auth-gate" id="fast-gate"><span class="lock">✓</span><h2>Sign in to start the challenge</h2><p>Your account keeps your personal best streak connected to you and updates the class Streak Spotlight automatically.</p><button id="fast-signin">Sign in with your school account</button><small>One click with your school account, then start playing.</small></div>
+      <div id="fast-game" hidden><div class="game-stats"><article><small>Score</small><b id="fast-score">0</b></article><article><small>Streak</small><b id="fast-streak">0</b></article><article><small>Answered</small><b id="fast-count">0</b></article><article><small>Best skill</small><b id="fast-best">Start playing</b></article></div>
       <div class="fast-shell">
         <article class="question-card">
           <div class="question-meta"><span id="fast-category"></span><b id="fast-standard"></b><button id="fast-reset">Reset game</button></div>
@@ -110,7 +112,7 @@
     </section>
 
     <section class="view" id="view-explore">
-      <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Learning beyond today's task</p><h1>Explore the ELA Studio</h1><p>Standards, leadership habits, public assessment context, and useful links.</p></div>
+      <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Learning beyond today's task</p><h1>Explore Mrs. Baker's Classroom</h1><p>Standards, leadership habits, public assessment context, and useful links.</p></div>
       <div class="explore-tabs"><button class="active" data-panel="learning">B.E.S.T. Map</button><button data-panel="data">Public Data</button><button data-panel="habits">7 Habits</button><button data-panel="resources">Resources</button></div>
       <div class="explore-panel active" id="panel-learning"><h2>Grade 6 B.E.S.T. learning map</h2><p>Our StudySync lessons build skills across five connected areas.</p><div class="strand-grid"><article><b>Reading Literature</b><span>Character, setting, plot, theme, perspective, and poetry</span></article><article><b>Reading Informational Text</b><span>Central idea, structure, purpose, perspective, and argument</span></article><article><b>Writing</b><span>Argumentative, expository, and narrative communication</span></article><article><b>Vocabulary</b><span>Morphology, context, figurative language, and reference tools</span></article><article><b>Communication</b><span>Discussion, collaboration, presentation, and research</span></article></div><a class="resource-link" href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf#page=79" target="_blank" rel="noreferrer">Official Grade 6 Florida B.E.S.T. ELA standards ↗</a></div>
       <div class="explore-panel" id="panel-data"><h2>Public Grade 6 FAST data</h2><p>A clear picture of how Grade 6 readers performed on Florida's 2025 ELA assessment — shown for context, not labels. Lake Manatee K-8 begins its baseline year in 2026–27.</p>
@@ -130,11 +132,11 @@
         </div>
       </div>
       <div class="explore-panel" id="panel-habits"><h2>The 7 Habits in ELA</h2><div class="habit-list"><article><b>1</b><span><strong>Be Proactive</strong> Ask for the support you need.</span></article><article><b>2</b><span><strong>Begin With the End in Mind</strong> Know the learning goal before you begin.</span></article><article><b>3</b><span><strong>Put First Things First</strong> Complete the most important step first.</span></article><article><b>4</b><span><strong>Think Win-Win</strong> Build solutions where everyone learns.</span></article><article><b>5</b><span><strong>Seek First to Understand</strong> Listen closely before responding.</span></article><article><b>6</b><span><strong>Synergize</strong> Combine ideas to create stronger work.</span></article><article><b>7</b><span><strong>Sharpen the Saw</strong> Care for your mind and reading life.</span></article></div></div>
-      <div class="explore-panel" id="panel-resources"><h2>Resource shelf</h2><div class="resource-list"><a href="teacher.html"><b>Teacher Dashboard Preview</b><span>See sample bell-work submissions →</span></a><a href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. ELA Standards</b><span>Official benchmarks and clarifications ↗</span></a><a href="https://www.fldoe.org/file/20102/TDS-FAST-ELA.pdf" target="_blank" rel="noreferrer"><b>Grade 6 FAST ELA Blueprint</b><span>Assessed benchmarks and reporting categories ↗</span></a><a href="https://flfast.org/families.html" target="_blank" rel="noreferrer"><b>FAST Family Portal</b><span>Official student and family resources ↗</span></a><a href="https://www.manateeschools.net/" target="_blank" rel="noreferrer"><b>Manatee County Schools</b><span>District information and services ↗</span></a><a href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank" rel="noreferrer"><b>Purdue Writing Lab</b><span>Writing and grammar support ↗</span></a></div></div>
+      <div class="explore-panel" id="panel-resources"><h2>Resource shelf</h2><div class="resource-list"><a href="/teacher"><b>Teacher Dashboard Preview</b><span>See sample bell-work submissions →</span></a><a href="https://www.fldoe.org/core/fileparse.php/7539/urlt/elabeststandardsfinal.pdf" target="_blank" rel="noreferrer"><b>Florida B.E.S.T. ELA Standards</b><span>Official benchmarks and clarifications ↗</span></a><a href="https://www.fldoe.org/file/20102/TDS-FAST-ELA.pdf" target="_blank" rel="noreferrer"><b>Grade 6 FAST ELA Blueprint</b><span>Assessed benchmarks and reporting categories ↗</span></a><a href="https://flfast.org/families.html" target="_blank" rel="noreferrer"><b>FAST Family Portal</b><span>Official student and family resources ↗</span></a><a href="https://www.manateeschools.net/" target="_blank" rel="noreferrer"><b>Manatee County Schools</b><span>District information and services ↗</span></a><a href="https://owl.purdue.edu/owl/general_writing/index.html" target="_blank" rel="noreferrer"><b>Purdue Writing Lab</b><span>Writing and grammar support ↗</span></a></div></div>
     </section>
   </main>
 
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's ELA Studio</p><h2>Sign in to your class account</h2><p>Use Google once. Your account will work immediately for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="google-signin" id="google-signin" type="button">Continue with Google</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><div class="period-setup" id="period-setup" hidden><label for="period-select">Which class period are you in?</label><select id="period-select"><option value="">Choose your period</option><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select><button id="save-period" type="button">Save my period</button></div><button class="text-button period-display" id="period-display" type="button" hidden></button><a class="teacher-link" id="teacher-link" href="teacher.html" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=2"></script><script src="app.js?v=8"></script>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2>Sign in to your class account</h2><p>One click with your school Microsoft account — no password to remember here. Your account works for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="ms-signin" id="ms-signin" type="button">Sign in with your school account</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><div class="period-setup" id="period-setup" hidden><label for="period-select">Which class period are you in?</label><select id="period-select"><option value="">Choose your period</option><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select><button id="save-period" type="button">Save my period</button></div><button class="text-button period-display" id="period-display" type="button" hidden></button><a class="teacher-link" id="teacher-link" href="/teacher" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=3"></script><script src="app.js?v=9"></script>
 </body>
 </html>

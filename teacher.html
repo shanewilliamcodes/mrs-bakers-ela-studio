@@ -1,10 +1,113 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mrs. Baker’s Bell Work Dashboard</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23742747'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='28' fill='%23fff'%3ETB%3C/text%3E%3C/svg%3E"><meta name="robots" content="noindex"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="teacher.css?v=3"></head><body>
-<header><a href="index.html">← Classroom site</a><div><b>Mrs. Baker’s</b><small>Bell Work Dashboard</small></div><button id="teacher-signout" hidden>Sign out</button></header>
-<main><section class="teacher-hero"><p>Grade 6 ELA · Private teacher view</p><h1>Bell work at a glance.</h1><div id="auth-box"><p>Sign in with Mrs. Baker’s approved teacher Google account.</p><button id="teacher-signin">Teacher sign in</button><button id="demo-dashboard" type="button">Preview with sample submissions</button></div><p id="teacher-status" role="status"></p></section>
-<section id="dashboard-content" hidden>
-<details class="teacher-help"><summary>How this dashboard works</summary><ul><li><b>Submissions</b> are one per student per school day. A pencil ✏️ means the student edited after first submitting (students can only edit the same day).</li><li><b>Need help</b> counts confidence 1–2. Open one and press <b>Mark checked in</b> after you talk with the student — it stays marked for you.</li><li><b>Today's message</b> below lets you replace today's bell work prompt and post an announcement on the student homepage. Clearing the fields and saving removes them.</li><li><b>Export CSV</b> downloads whatever the filters currently show.</li><li>Students choose their <b>period</b> at first sign-in. If one picks wrong, they can change it from their account menu.</li></ul></details>
-<div class="today-editor"><h2>Today's message to students</h2><div class="today-grid"><label>Announcement (homepage banner)<input id="announce-input" maxlength="200" placeholder="e.g. Bring your independent reading book tomorrow!"></label><label>Replace today's bell work prompt (optional)<textarea id="prompt-input" rows="2" placeholder="Leave blank to keep the scheduled prompt"></textarea></label><label>Sentence starter (optional)<input id="starter-input" maxlength="160" placeholder="e.g. I think ___ because ___."></label></div><div class="today-actions"><button id="save-today">Publish for today</button><span id="today-status" role="status"></span></div></div>
-<div class="controls"><label>Date<input type="date" id="date-filter"></label><label>Period<select id="period-filter"><option value="">All periods</option></select></label><label>Standard<select id="standard-filter"><option value="">All standards</option></select></label><button id="refresh-data">Refresh</button><button id="export-data">Export CSV</button></div>
-<div class="teacher-metrics"><article><span>Submitted</span><strong id="submission-total">0</strong></article><article><span>Students</span><strong id="student-total">0</strong></article><article><span>Average words</span><strong id="word-average">0</strong></article><article><span>Need help</span><strong id="help-total">0</strong><small>Confidence 1–2</small></article></div>
-<div class="response-layout"><aside><h2>Submissions</h2><div id="submission-list"></div></aside><article id="response-detail"><p>Select a student response to review it.</p></article></div></section></main>
-<script src="firebase-config.js"></script><script type="module" src="teacher.js?v=3"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mrs. Baker's Bell Work Dashboard</title>
+  <script>if(location.hostname.endsWith('github.io'))location.replace('https://mrs-bakers-classroom.vercel.app'+location.pathname.replace('/mrs-bakers-ela-studio','')+location.hash);</script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23742747'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='28' fill='%23fff'%3ETB%3C/text%3E%3C/svg%3E">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="teacher.css?v=4">
+</head>
+<body>
+  <header>
+    <a href="/">← Classroom site</a>
+    <div><b>Mrs. Baker's</b><small>Bell Work Dashboard</small></div>
+    <button id="teacher-signout" hidden>Sign out</button>
+  </header>
+
+  <main>
+    <section class="teacher-hero">
+      <p>Grade 6 ELA · Private teacher view</p>
+      <h1>Who did it, who didn't, who needs me?</h1>
+      <div id="auth-box">
+        <p>Sign in with Mrs. Baker's approved school Microsoft account.</p>
+        <button id="teacher-signin">Teacher sign in</button>
+        <button id="demo-dashboard" type="button">Preview with sample submissions</button>
+      </div>
+      <p id="teacher-status" role="status"></p>
+    </section>
+
+    <section id="dashboard-content" hidden>
+      <nav class="dash-tabs" aria-label="Dashboard sections">
+        <button class="active" data-tab="today">Today</button>
+        <button data-tab="week">Week</button>
+        <button data-tab="setup">Class setup</button>
+      </nav>
+
+      <section class="tab-panel active" id="tab-today">
+        <div class="controls">
+          <label>Date<input type="date" id="date-filter"></label>
+          <label>Period<select id="period-filter"><option value="">All periods</option></select></label>
+          <label>Standard<select id="standard-filter"><option value="">All standards</option></select></label>
+          <label class="toggle"><input type="checkbox" id="needs-filter"> Needs help only</label>
+          <label class="toggle"><input type="checkbox" id="unreviewed-filter"> Unreviewed only</label>
+          <label class="toggle"><input type="checkbox" id="edited-filter"> Edited only</label>
+          <button id="refresh-data">Refresh</button>
+          <button id="export-data">Export CSV</button>
+        </div>
+
+        <p class="school-day-note" id="school-day-note" hidden></p>
+
+        <div class="teacher-metrics">
+          <article><span>Submitted</span><strong id="submission-total">0/0</strong></article>
+          <article><span>Missing</span><strong id="missing-total">0</strong></article>
+          <article><span>Need help</span><strong id="help-total">0</strong><small>Confidence 1-2</small></article>
+          <article><span>Checked in</span><strong id="checked-total">0</strong></article>
+          <article><span>Average words</span><strong id="word-average">0</strong></article>
+        </div>
+
+        <div class="teacher-main-grid">
+          <section class="completion-board">
+            <div class="section-head"><h2>Completion board</h2><span id="board-count"></span></div>
+            <div class="chip-key"><span>✓ submitted</span><span>□ missing</span><span>! needs help</span><span>✎ edited</span><span>✓✓ checked in</span></div>
+            <div id="completion-board"></div>
+          </section>
+          <article id="response-detail" class="detail-panel">
+            <p>Select a student chip to review their work or recent history.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-week" hidden>
+        <div class="week-shell">
+          <div class="section-head"><h2>Last 5 school days</h2><span id="week-range"></span></div>
+          <div id="week-matrix" class="week-matrix"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-setup" hidden>
+        <div class="setup-grid">
+          <section class="today-editor">
+            <h2>Today's message to students</h2>
+            <div class="today-grid">
+              <label>Announcement (homepage banner)<input id="announce-input" maxlength="200" placeholder="e.g. Bring your independent reading book tomorrow!"></label>
+              <label>Replace today's bell work prompt (optional)<textarea id="prompt-input" rows="3" placeholder="Leave blank to keep the scheduled prompt"></textarea></label>
+              <label>Sentence starter (optional)<input id="starter-input" maxlength="160" placeholder="e.g. I think ___ because ___."></label>
+            </div>
+            <div class="today-actions"><button id="save-today">Publish for today</button><span id="today-status" role="status"></span></div>
+          </section>
+
+          <section class="leaderboard-admin">
+            <h2>Streak Spotlight moderation</h2>
+            <p>Remove a row if a display name or streak needs a reset.</p>
+            <ol id="leaderboard-admin-list"></ol>
+          </section>
+
+          <section class="roster-admin">
+            <h2>Roster quick fixes</h2>
+            <p>Use this when a student picked the wrong period or their school account name needs cleanup.</p>
+            <div id="roster-list"></div>
+          </section>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="firebase-config.js"></script>
+  <script type="module" src="teacher.js?v=4"></script>
+</body>
+</html>
