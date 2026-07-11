@@ -57,7 +57,7 @@ response.addEventListener('input',()=>{localStorage.setItem(draftKey(),response.
 document.querySelector('#starter-toggle').addEventListener('click',()=>document.querySelector('#sentence-starter').toggleAttribute('hidden'));
 document.querySelector('#bellwork-signin').addEventListener('click',()=>document.querySelector('#account-dialog').showModal());
 document.querySelector('#fast-signin').addEventListener('click',()=>document.querySelector('#account-dialog').showModal());
-function updateGate(gateId,allowed,title,text){const gate=document.querySelector(gateId);gate.hidden=Boolean(allowed);if(allowed)return;gate.querySelector('h2').textContent=title;gate.querySelector('p').textContent=text;gate.querySelector('button').textContent='Sign in with your school email'}
+function updateGate(gateId,allowed,title,text){const gate=document.querySelector(gateId);gate.hidden=Boolean(allowed);if(allowed)return;gate.querySelector('h2').textContent=title;gate.querySelector('p').textContent=text;gate.querySelector('button').textContent='Sign in with your class code'}
 let todaySubmission=null,editing=false;
 function bellDocId(){return `${authState.user.uid}_${todayKey}`}
 function setBellBadge(done){const card=document.querySelector('#bell-launch');if(card)card.classList.toggle('done',done);const tag=document.querySelector('#bell-launch-tag');if(tag)tag.textContent=done?'Completed today ✓':'Start here';const cta=document.querySelector('#bell-launch-cta');if(cta)cta.textContent=done?'Review →':'Open →';const note=document.querySelector('#home-note-btn');if(note)note.textContent=done?"Review today's bell work":'Begin bell work'}

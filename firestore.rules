@@ -3,8 +3,12 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    // email_verified guard matters: without it, anyone could create a password
+    // account with the teacher's (publicly visible) email and inherit the role.
     function isTeacherEmail() {
-      return signedIn() && request.auth.token.email == 'bakert4@manateeschools.net';
+      return signedIn()
+        && request.auth.token.email == 'bakert4@manateeschools.net'
+        && request.auth.token.email_verified == true;
     }
     function isTeacher() {
       return signedIn()
@@ -41,6 +45,23 @@ service cloud.firestore {
         && request.resource.data.studentUid == resource.data.studentUid
         && request.resource.data.response == resource.data.response
         && request.resource.data.date == resource.data.date);
+      allow delete: if isTeacher();
+    }
+    // Class rosters for code sign-in. The doc ID IS the class code, so knowing
+    // the code is what unlocks the name picker (get only — never list) before
+    // a student has an account. Contents are first name + last initial only.
+    match /rosters/{code} {
+      allow get: if true;
+      allow list: if isTeacher();
+      allow write: if isTeacher();
+    }
+    // One doc per claimed roster entry, created by the student who claimed it.
+    // Public get lets the sign-in flow tell "new student" from "returning".
+    match /claims/{entryId} {
+      allow get: if true;
+      allow list: if isTeacher();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if false;
       allow delete: if isTeacher();
     }
     // Teacher-published settings (today's prompt override, announcements).

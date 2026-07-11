@@ -1,0 +1,8 @@
+{
+  "name": "mrs-bakers-classroom",
+  "private": true,
+  "description": "Static classroom site; package.json exists only for the api/ serverless functions.",
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

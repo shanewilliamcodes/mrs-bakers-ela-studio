@@ -8,7 +8,7 @@ const content=document.querySelector('#dashboard-content');
 const teacherEmail='bakert4@manateeschools.net';
 const emailStorageKey='bakerSignInEmail';
 const todayKey=()=>new Date().toLocaleDateString('en-CA');
-const state={demo:false,teacher:null,roster:[],rows:[],weekRows:[],leaderboard:[],selectedUid:null};
+const state={demo:false,teacher:null,roster:[],rows:[],weekRows:[],leaderboard:[],selectedKey:null,classCode:null,entries:[],claims:{}};
 let db,auth;
 
 const demoDate=todayKey();
@@ -23,6 +23,14 @@ const demoRows=[
   {id:'demo-2',date:demoDate,studentName:'Mason Chen',studentUid:'demo-b',period:3,standard:'ELA.6.R.2.4',label:'Argument',wordCount:43,confidence:1,prompt:'Should sixth-grade students have a short independent reading period every school day?',response:'I think students should read every day because it can help them improve. It also gives people a quiet time to focus. Some students may find a book they really like. I still need help explaining my evidence more clearly.',editCount:1,editedAt:new Date(),submittedAt:new Date()},
   {id:'demo-3',date:schoolDaysEnding(demoDate,5)[2],studentName:'Jordan Patel',studentUid:'demo-c',period:5,standard:'ELA.6.V.1.2',label:'Vocabulary',wordCount:38,confidence:2,prompt:'What does reread mean?',response:'Reread means to read again. The prefix re- means again, so the word tells me the student reads the page another time.',submittedAt:new Date(Date.now()-864e5*3)}
 ];
+const demoEntries=[
+  {id:'demoav01',first:'Ava',lastInitial:'R',period:3},
+  {id:'demomc02',first:'Mason',lastInitial:'C',period:3},
+  {id:'demojp03',first:'Jordan',lastInitial:'P',period:5},
+  {id:'demotb04',first:'Taylor',lastInitial:'B',period:5},
+  {id:'demonew5',first:'Sofia',lastInitial:'M',period:5}
+];
+const demoClaims={demoav01:'demo-a',demomc02:'demo-b',demojp03:'demo-c',demotb04:'demo-d'};
 const demoLeaderboard=[
   {uid:'demo-b',displayName:'Mason C.',period:3,bestStreak:7},
   {uid:'demo-a',displayName:'Ava R.',period:3,bestStreak:5}
@@ -87,6 +95,9 @@ document.querySelector('#demo-dashboard').addEventListener('click',()=>{
   state.demo=true;
   state.teacher={uid:'demo-teacher',displayName:'Preview teacher'};
   state.roster=demoRoster.map(x=>({...x}));
+  state.classCode='DEMO26';
+  state.entries=demoEntries.map(x=>({...x}));
+  state.claims={...demoClaims};
   state.rows=demoRows.filter(x=>x.date===document.querySelector('#date-filter').value).map(x=>({...x}));
   state.weekRows=demoRows.map(x=>({...x}));
   state.leaderboard=demoLeaderboard.map(x=>({...x}));
@@ -122,7 +133,13 @@ async function loadData(){
     const rowsPromise=getDocs(query(collection(db,'bellwork'),where('date','==',date)));
     const weekPromises=days.map(day=>getDocs(query(collection(db,'bellwork'),where('date','==',day))));
     const leaderboardPromise=getDocs(query(collection(db,'leaderboard'),orderBy('bestStreak','desc'),limit(10)));
-    const [rosterSnap,rowsSnap,leaderboardSnap,...weekSnaps]=await Promise.all([rosterPromise,rowsPromise,leaderboardPromise,...weekPromises]);
+    const codesPromise=getDocs(collection(db,'rosters'));
+    const claimsPromise=getDocs(collection(db,'claims'));
+    const [rosterSnap,rowsSnap,leaderboardSnap,codesSnap,claimsSnap,...weekSnaps]=await Promise.all([rosterPromise,rowsPromise,leaderboardPromise,codesPromise,claimsPromise,...weekPromises]);
+    const codeDoc=codesSnap.docs[0];
+    state.classCode=codeDoc?codeDoc.id:null;
+    state.entries=codeDoc?(codeDoc.data().students||[]).map(x=>({id:String(x.id),first:String(x.first||'Student'),lastInitial:String(x.lastInitial||''),period:Number(x.period)||0})):[];
+    state.claims={};claimsSnap.docs.forEach(x=>{state.claims[x.id]=x.data()?.uid});
     state.roster=rosterSnap.docs.map(x=>({uid:x.id,...x.data(),displayName:normalizeName(x.data().displayName||x.data().email||'Student')})).sort(byName);
     state.rows=rowsSnap.docs.map(x=>({id:x.id,...x.data()}));
     state.weekRows=weekSnaps.flatMap(snap=>snap.docs.map(x=>({id:x.id,...x.data()})));
@@ -180,7 +197,7 @@ function renderToday(){
     const done=group.filter(x=>x.row).length;
     return `<section class="period-group"><h3>${escapeHtml(period)} <span>${done}/${group.length}</span></h3><div class="student-chips">${group.sort((a,b)=>byName(a.student,b.student)).map(renderChip).join('')}</div></section>`;
   }).join(''):'<p class="empty">No students match these filters.</p>';
-  document.querySelectorAll('[data-student-chip]').forEach(button=>button.addEventListener('click',()=>showStudent(button.dataset.uid)));
+  document.querySelectorAll('[data-student-chip]').forEach(button=>button.addEventListener('click',()=>showStudent(button.dataset.key)));
 }
 
 function boardItems(){
@@ -190,7 +207,7 @@ function boardItems(){
   const unreviewed=document.querySelector('#unreviewed-filter').checked;
   const edited=document.querySelector('#edited-filter').checked;
   const rows=rowMap(state.rows);
-  return effectiveRoster().map(student=>({student,row:rows.get(student.uid)})).filter(({student,row})=>{
+  return effectiveRoster().map(student=>({student,row:student.uid?rows.get(student.uid):undefined})).filter(({student,row})=>{
     const p=student.period||row?.period;
     if(period&&String(p)!==period)return false;
     if(standard&&row&&row.standard!==standard)return false;
@@ -206,18 +223,19 @@ function renderChip({student,row}){
   if(row?.editedAt)classes.push('edited');
   if(Number(row?.confidence)<=2)classes.push('needs');
   if(row?.reviewedAt)classes.push('reviewed');
-  const status=row?(row.reviewedAt?'✓✓':Number(row.confidence)<=2?'!':row.editedAt?'✎':'✓'):'□';
-  const sub=row?`${row.wordCount||0} words · confidence ${row.confidence||'—'}/4`:'No submission yet';
-  return `<button class="${classes.join(' ')}" data-student-chip data-uid="${escapeHtml(student.uid)}"><b>${status}</b><span>${escapeHtml(student.displayName||row?.studentName||'Student')}</span><small>${escapeHtml(sub)}</small></button>`;
+  const status=row?(row.reviewedAt?'✓✓':Number(row.confidence)<=2?'!':row.editedAt?'✎':'✓'):(student.claimed?'□':'·');
+  const sub=row?`${row.wordCount||0} words · confidence ${row.confidence||'—'}/4`:(student.claimed?'No submission yet':'Has not created a PIN yet');
+  return `<button class="${classes.join(' ')}" data-student-chip data-key="${escapeHtml(student.key)}"><b>${status}</b><span>${escapeHtml(student.displayName||row?.studentName||'Student')}</span><small>${escapeHtml(sub)}</small></button>`;
 }
 
-async function showStudent(uid){
-  state.selectedUid=uid;
-  const student=effectiveRoster().find(x=>x.uid===uid)||{uid,displayName:'Student'};
-  const row=rowMap(state.rows).get(uid);
+async function showStudent(key){
+  state.selectedKey=key;
+  const roster=effectiveRoster();
+  const student=roster.find(x=>x.key===key)||roster.find(x=>x.uid===key)||{key,uid:key,displayName:'Student',claimed:true};
+  const row=student.uid?rowMap(state.rows).get(student.uid):undefined;
   const detail=document.querySelector('#response-detail');
   detail.innerHTML='<p>Loading student history...</p>';
-  const history=await loadStudentHistory(uid);
+  const history=student.uid?await loadStudentHistory(student.uid):[];
   const historyHtml=history.length?history.map(x=>`<li><b>${escapeHtml(x.date||'')}</b><span>${escapeHtml(x.label||x.standard||'Bell work')}</span><small>${x.wordCount||0} words · confidence ${x.confidence||'—'}/4</small></li>`).join(''):'<li><span>No previous submissions found.</span></li>';
   const responseHtml=row?`
     <p class="eyebrow">${escapeHtml(row.date||'')}</p>
@@ -236,7 +254,7 @@ async function showStudent(uid){
   `:`
     <p class="eyebrow">${escapeHtml(document.querySelector('#date-filter').value||todayKey())}</p>
     <h2>${escapeHtml(student.displayName||'Student')}</h2>
-    <div class="missing-detail">No submission yet for this date.</div>
+    <div class="missing-detail">${student.claimed?'No submission yet for this date.':'This student has not created their PIN yet — they appear on the sign-in name picker and just need the class code.'}</div>
   `;
   detail.innerHTML=responseHtml+`
     <section class="student-tools">
@@ -253,7 +271,7 @@ async function showStudent(uid){
   `;
   const check=document.querySelector('#checkin-btn');
   if(check)check.addEventListener('click',()=>checkIn(row));
-  document.querySelector('#save-student').addEventListener('click',()=>saveStudentInfo(student.uid));
+  document.querySelector('#save-student').addEventListener('click',()=>saveStudentInfo(student.key));
 }
 
 async function loadStudentHistory(uid){
@@ -279,19 +297,27 @@ async function checkIn(row){
   }catch(e){status.textContent='Could not save the check-in. Try refreshing.'}
 }
 
-async function saveStudentInfo(uid){
+async function saveStudentInfo(key){
   const name=normalizeName(document.querySelector('#fix-name').value);
+  const parts=name.split(/\s+/);
+  const first=parts[0]||'Student',lastInitial=(parts[1]||'').replace(/\W/g,'').slice(0,2);
+  const label=`${first} ${lastInitial}.`;
   const period=Number(document.querySelector('#fix-period').value)||null;
   const statusEl=document.querySelector('#student-save-status');
+  const student=effectiveRoster().find(x=>x.key===key);
   try{
-    if(!state.demo)await setDoc(doc(db,'users',uid),{displayName:name,period,updatedAt:serverTimestamp()},{merge:true});
-    state.roster=state.roster.map(x=>x.uid===uid?{...x,displayName:name,period}:x);
-    state.rows=state.rows.map(x=>x.studentUid===uid?{...x,studentName:name,period}:x);
-    state.weekRows=state.weekRows.map(x=>x.studentUid===uid?{...x,studentName:name,period}:x);
+    if(student?.entryId){
+      state.entries=state.entries.map(x=>x.id===student.entryId?{...x,first,lastInitial,period:period||x.period}:x);
+      await saveRosterDoc();
+    }
+    if(student?.uid&&!state.demo)await setDoc(doc(db,'users',student.uid),{displayName:label,first,lastInitial,period,updatedAt:serverTimestamp()},{merge:true});
+    state.roster=state.roster.map(x=>x.uid===student?.uid?{...x,displayName:label,period}:x);
+    state.rows=state.rows.map(x=>x.studentUid===student?.uid?{...x,studentName:label,period}:x);
+    state.weekRows=state.weekRows.map(x=>x.studentUid===student?.uid?{...x,studentName:label,period}:x);
     statusEl.textContent='Saved.';
     populateFilters();
     renderAll();
-    showStudent(uid);
+    showStudent(key);
   }catch(e){statusEl.textContent='Could not save.'}
 }
 
@@ -302,7 +328,7 @@ function renderWeek(){
   const rowsByUid=groupBy(state.weekRows,x=>x.studentUid);
   const head=`<div class="week-row week-head"><b>Student</b>${days.map(d=>`<b>${escapeHtml(shortDate(d))}</b>`).join('')}<b>Streak</b></div>`;
   const body=students.map(student=>{
-    const studentRows=rowsByUid[student.uid]||[];
+    const studentRows=(student.uid&&rowsByUid[student.uid])||[];
     const dates=new Set(studentRows.map(x=>x.date));
     return `<div class="week-row"><span>${escapeHtml(student.displayName||'Student')}</span>${days.map(day=>weekDot(studentRows.find(x=>x.date===day),dates.has(day))).join('')}<strong>${bellStreakFrom(studentRows,days.at(-1))}</strong></div>`;
   }).join('');
@@ -333,10 +359,125 @@ async function removeLeaderboard(uid){
 }
 
 function renderRosterAdmin(){
-  const el=document.querySelector('#roster-list');
-  const roster=effectiveRoster().sort(byName);
-  el.innerHTML=roster.length?roster.map(student=>`<button data-roster-student="${escapeHtml(student.uid)}"><b>${escapeHtml(student.displayName||'Student')}</b><span>${escapeHtml(periodLabel(student.period))}</span></button>`).join(''):'<p class="empty">No student roster loaded yet.</p>';
-  document.querySelectorAll('[data-roster-student]').forEach(button=>button.addEventListener('click',()=>{switchTab('today');showStudent(button.dataset.rosterStudent)}));
+  document.querySelector('#class-code-value').textContent=state.classCode||'------';
+  const el=document.querySelector('#roster-entries');
+  if(!state.entries.length){el.innerHTML='<p class="empty">No students yet. Add your class lists above — a class code is created automatically.</p>';return}
+  const groups=groupBy([...state.entries].sort((a,b)=>a.period-b.period||a.first.localeCompare(b.first)),x=>periodLabel(x.period));
+  el.innerHTML=Object.entries(groups).map(([period,entries])=>`<div class="roster-entry-group"><h3>${escapeHtml(period)} <small>${entries.length} student${entries.length===1?'':'s'}</small></h3>${entries.map(entry=>{
+    const claimed=Boolean(state.claims[entry.id]);
+    return `<div class="roster-entry"><b>${escapeHtml(entry.first)} ${escapeHtml(entry.lastInitial)}.</b><small class="${claimed?'claimed':''}">${claimed?'✓ PIN created':'no PIN yet'}</small><button data-view-entry="${escapeHtml(entry.id)}" type="button">View</button>${claimed?`<button data-reset-pin="${escapeHtml(entry.id)}" type="button">Reset PIN</button>`:''}<button class="danger" data-remove-entry="${escapeHtml(entry.id)}" type="button">Remove</button></div>`;
+  }).join('')}</div>`).join('');
+  document.querySelectorAll('[data-view-entry]').forEach(b=>b.addEventListener('click',()=>{const entry=state.entries.find(x=>x.id===b.dataset.viewEntry);switchTab('today');showStudent(state.claims[entry.id]||`entry:${entry.id}`)}));
+  document.querySelectorAll('[data-reset-pin]').forEach(b=>b.addEventListener('click',()=>resetPin(b.dataset.resetPin)));
+  document.querySelectorAll('[data-remove-entry]').forEach(b=>b.addEventListener('click',()=>removeEntry(b.dataset.removeEntry)));
+}
+
+const CODE_ALPHABET='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function randomFrom(alphabet,length){let out='';const buf=new Uint32Array(length);crypto.getRandomValues(buf);for(let i=0;i<length;i++)out+=alphabet[buf[i]%alphabet.length];return out}
+function genCode(){return randomFrom(CODE_ALPHABET,6)}
+function genEntryId(){return randomFrom('abcdefghjkmnpqrstuvwxyz23456789',8)}
+
+async function saveRosterDoc(){
+  if(state.demo)return;
+  if(!state.classCode)state.classCode=genCode();
+  await setDoc(doc(db,'rosters',state.classCode),{students:state.entries,updatedAt:serverTimestamp()});
+}
+
+// Two students named "Emma S." in one period get longer initials until unique.
+function uniqueInitial(first,last,period,taken){
+  for(let len=1;len<=last.length;len++){
+    const initial=last.slice(0,len);
+    if(!taken.some(x=>x.period===period&&x.first.toLowerCase()===first.toLowerCase()&&x.lastInitial.toLowerCase()===initial.toLowerCase()))return initial;
+  }
+  return last;
+}
+
+async function addStudents(){
+  const statusEl=document.querySelector('#roster-status');
+  const period=Number(document.querySelector('#add-period').value);
+  const lines=document.querySelector('#add-names').value.split('\n').map(x=>normalizeName(x).trim()).filter(x=>x&&x!=='Student');
+  if(!lines.length){statusEl.textContent='Type at least one name.';return}
+  const added=[];
+  lines.forEach(line=>{
+    const parts=line.split(/\s+/);
+    const first=parts[0],last=(parts.slice(1).join('')||'X').replace(/\W/g,'')||'X';
+    const lastInitial=uniqueInitial(first,last,period,state.entries.concat(added));
+    added.push({id:genEntryId(),first,lastInitial,period});
+  });
+  state.entries=state.entries.concat(added);
+  try{
+    await saveRosterDoc();
+    document.querySelector('#add-names').value='';
+    statusEl.textContent=`Added ${added.length} student${added.length===1?'':'s'} to Period ${period}.`;
+    renderRosterAdmin();renderToday();renderWeek();populateFilters();
+  }catch(e){
+    state.entries=state.entries.filter(x=>!added.includes(x));
+    statusEl.textContent='Could not save the roster. Check the connection and Firestore rules.';
+  }
+}
+
+async function removeEntry(entryId){
+  const entry=state.entries.find(x=>x.id===entryId);
+  if(!entry)return;
+  if(!confirm(`Remove ${entry.first} ${entry.lastInitial}. from the roster? Their past bell work stays visible, but they will not be able to sign in.`))return;
+  state.entries=state.entries.filter(x=>x.id!==entryId);
+  try{
+    await saveRosterDoc();
+    if(!state.demo&&state.claims[entryId])await deleteDoc(doc(db,'claims',entryId)).catch(()=>{});
+    delete state.claims[entryId];
+    renderRosterAdmin();renderToday();renderWeek();
+  }catch(e){status.textContent='Could not update the roster.'}
+}
+
+async function resetPin(entryId){
+  const entry=state.entries.find(x=>x.id===entryId);
+  if(!entry)return;
+  if(state.demo){alert('Preview mode — sign in to reset a real PIN.');return}
+  const pin=prompt(`New 6-digit PIN for ${entry.first} ${entry.lastInitial}.`);
+  if(pin===null)return;
+  if(!/^\d{6}$/.test(pin.trim())){alert('The PIN must be exactly 6 numbers.');return}
+  try{
+    const idToken=await auth.currentUser.getIdToken();
+    const res=await fetch('/api/reset-pin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken,entryId,newPin:pin.trim()})});
+    if(res.ok){status.textContent=`PIN reset for ${entry.first} ${entry.lastInitial}. — they can sign in with it right away.`;return}
+    const bodyText=await res.text();
+    if(res.status===501||res.status===404){
+      // Reset service not configured yet: offer a fresh start instead.
+      if(confirm('The instant PIN reset service is not set up yet. Give this student a fresh start instead? They will pick a new PIN, but their streak resets.')){
+        state.entries=state.entries.map(x=>x.id===entryId?{...x,id:genEntryId()}:x);
+        await saveRosterDoc();
+        await deleteDoc(doc(db,'claims',entryId)).catch(()=>{});
+        delete state.claims[entryId];
+        renderRosterAdmin();renderToday();
+        status.textContent=`${entry.first} ${entry.lastInitial}. can now sign in again as a new student.`;
+      }
+      return;
+    }
+    status.textContent=`PIN reset failed (${res.status}): ${bodyText.slice(0,120)}`;
+  }catch(e){status.textContent='PIN reset failed — check the connection.'}
+}
+
+async function regenerateCode(){
+  if(state.demo){alert('Preview mode only.');return}
+  if(!confirm('Create a new class code? The old code stops working; students already signed in are not affected.'))return;
+  const oldCode=state.classCode;
+  state.classCode=genCode();
+  try{
+    await saveRosterDoc();
+    if(oldCode)await deleteDoc(doc(db,'rosters',oldCode)).catch(()=>{});
+    renderRosterAdmin();
+    document.querySelector('#code-status').textContent='New class code created.';
+  }catch(e){state.classCode=oldCode;document.querySelector('#code-status').textContent='Could not create a new code.'}
+}
+
+function joinLink(){return `${location.origin}/?code=${state.classCode||''}`}
+function projectCode(){
+  if(!state.classCode)return;
+  const overlay=document.createElement('div');
+  overlay.className='code-overlay';
+  overlay.innerHTML=`<div><p>Go to <b style="font-size:clamp(1.2rem,4vw,2.4rem);letter-spacing:.05em">${escapeHtml(location.host)}</b></p><p>Student sign in → type this class code:</p><b>${escapeHtml(state.classCode)}</b><p>(click anywhere to close)</p></div>`;
+  overlay.addEventListener('click',()=>overlay.remove());
+  document.body.appendChild(overlay);
 }
 
 document.querySelector('#save-today').addEventListener('click',async()=>{
@@ -361,6 +502,14 @@ function exportCsv(){
   a.href=URL.createObjectURL(blob);a.download=`bellwork-${date}.csv`;a.click();URL.revokeObjectURL(a.href);
 }
 
+document.querySelector('#add-students').addEventListener('click',addStudents);
+document.querySelector('#regen-code').addEventListener('click',regenerateCode);
+document.querySelector('#project-code').addEventListener('click',projectCode);
+document.querySelector('#copy-join-link').addEventListener('click',async()=>{
+  if(!state.classCode)return;
+  try{await navigator.clipboard.writeText(joinLink());document.querySelector('#code-status').textContent='Join link copied.'}
+  catch(e){document.querySelector('#code-status').textContent=joinLink()}
+});
 document.querySelector('#refresh-data').addEventListener('click',loadData);
 document.querySelector('#export-data').addEventListener('click',exportCsv);
 document.querySelector('#date-filter').addEventListener('change',loadData);
@@ -373,8 +522,24 @@ function switchTab(name){
 }
 
 function effectiveRoster(){
-  const map=new Map(state.roster.map(x=>[x.uid,{...x,displayName:normalizeName(x.displayName||x.email||'Student')}]));
-  state.rows.concat(state.weekRows).forEach(row=>{if(row.studentUid&&!map.has(row.studentUid))map.set(row.studentUid,{uid:row.studentUid,displayName:normalizeName(row.studentName||'Student'),period:row.period,role:'student'})});
+  const map=new Map();
+  // Roster entries (the class list) are the source of truth, claimed or not.
+  state.entries.forEach(entry=>{
+    const uid=state.claims[entry.id]||null;
+    const key=uid||`entry:${entry.id}`;
+    map.set(key,{key,uid,entryId:entry.id,displayName:`${entry.first} ${entry.lastInitial}.`,first:entry.first,lastInitial:entry.lastInitial,period:entry.period,claimed:Boolean(uid),role:'student'});
+  });
+  // Legacy/self-created accounts not on the roster still appear.
+  const byUid=new Map([...map.values()].filter(x=>x.uid).map(x=>[x.uid,x]));
+  state.roster.forEach(u=>{
+    if(u.role!=='student')return;
+    if(byUid.has(u.uid))return;
+    map.set(u.uid,{key:u.uid,uid:u.uid,entryId:u.entryId||null,displayName:normalizeName(u.displayName||'Student'),period:u.period,claimed:true,legacy:true,role:'student'});
+  });
+  state.rows.concat(state.weekRows).forEach(row=>{
+    if(row.studentUid&&!map.has(row.studentUid)&&![...map.values()].some(x=>x.uid===row.studentUid))
+      map.set(row.studentUid,{key:row.studentUid,uid:row.studentUid,displayName:normalizeName(row.studentName||'Student'),period:row.period,claimed:true,legacy:true,role:'student'});
+  });
   return [...map.values()];
 }
 function rowMap(rows){const map=new Map();rows.forEach(row=>{if(row.studentUid&&!map.has(row.studentUid))map.set(row.studentUid,row)});return map}

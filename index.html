@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css?v=2">
-  <link rel="stylesheet" href="account.css?v=6">
+  <link rel="stylesheet" href="account.css?v=9">
   <link rel="stylesheet" href="leaderboard.css?v=2">
   <link rel="stylesheet" href="analytics.css?v=3">
   <link rel="stylesheet" href="bellwork.css?v=3">
@@ -60,7 +60,7 @@
     <section class="view" id="view-bellwork">
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Today's work</p><h1>Bell Work</h1><p>A new B.E.S.T.-aligned thinking routine every school day.</p></div>
       <div class="auth-gate" id="bellwork-gate">
-        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Sign in with your school email</button><small>Your private link arrives in Outlook.</small>
+        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Sign in with your class code</button><small>Type the class code from the board, tap your name, enter your PIN.</small>
       </div>
       <article class="bell-workspace" id="bellwork-workspace" hidden>
         <div class="bell-header"><div><span id="bell-day-type">Monday · Make a Claim</span><h2 id="bell-prompt">Loading today's prompt...</h2></div><div><small id="bell-date"></small><b id="bell-label"></b></div></div>
@@ -93,7 +93,7 @@
 
     <section class="view" id="view-fast">
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Florida Assessment of Student Thinking</p><h1>FAST Challenge</h1><p>Short, original Grade 6 practice aligned to Florida B.E.S.T. reading skills.</p></div>
-      <div class="auth-gate" id="fast-gate"><span class="lock">✓</span><h2>Sign in to start the challenge</h2><p>Your account keeps your personal best streak connected to you and updates the class Streak Spotlight automatically.</p><button id="fast-signin">Sign in with your school account</button><small>One click with your school account, then start playing.</small></div>
+      <div class="auth-gate" id="fast-gate"><span class="lock">✓</span><h2>Sign in to start the challenge</h2><p>Your account keeps your personal best streak connected to you and updates the class Streak Spotlight automatically.</p><button id="fast-signin">Sign in with your class code</button><small>Class code + your name + your PIN, then start playing.</small></div>
       <div id="fast-game" hidden><div class="game-stats"><article><small>Score</small><b id="fast-score">0</b></article><article><small>Streak</small><b id="fast-streak">0</b></article><article><small>Answered</small><b id="fast-count">0</b></article><article><small>Best skill</small><b id="fast-best">Start playing</b></article></div>
       <div class="fast-shell">
         <article class="question-card">
@@ -136,7 +136,35 @@
     </section>
   </main>
 
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2>Sign in to your class account</h2><p>Enter your school email. We will send a private sign-in link to your Outlook inbox, so there is no new password to remember.</p><div class="account-state" id="account-state"><label for="school-email">School email</label><input id="school-email" type="email" autocomplete="email" placeholder="name@manateeschools.net"><button class="ms-signin" id="email-signin" type="button">Email me a sign-in link</button><p class="privacy-note">Open the link on this computer to finish signing in.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><div class="period-setup" id="period-setup" hidden><label for="period-select">Which class period are you in?</label><select id="period-select"><option value="">Choose your period</option><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select><button id="save-period" type="button">Save my period</button></div><button class="text-button period-display" id="period-display" type="button" hidden></button><a class="teacher-link" id="teacher-link" href="/teacher" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=4"></script><script src="app.js?v=10"></script>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2 id="account-title">Sign in to your class account</h2><p id="account-intro">No email, no long password — just your class code, your name, and your secret PIN.</p><div class="account-state" id="account-state">
+    <div class="signin-step" id="step-code">
+      <label for="class-code">Class code</label>
+      <input id="class-code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="From the board, like BKR6ML">
+      <button class="ms-signin" id="code-continue" type="button">Continue</button>
+      <p class="privacy-note">Mrs. Baker shows the class code on the board. Don't have it? Just ask her.</p>
+      <a class="text-button teacher-entry" href="/teacher">Teacher? Sign in here</a>
+    </div>
+    <div class="signin-step" id="step-name" hidden>
+      <p class="step-label">Tap your class period</p>
+      <div class="period-choices" id="period-choices"></div>
+      <p class="step-label" id="name-label" hidden>Now tap your name</p>
+      <div class="name-grid" id="name-grid"></div>
+      <p class="privacy-note" id="name-note" hidden>Name not in the list? Tell Mrs. Baker and she will add you.</p>
+      <button class="text-button" id="back-to-code" type="button">← Use a different class code</button>
+    </div>
+    <div class="signin-step" id="step-pin" hidden>
+      <p class="pin-who" id="pin-who"></p>
+      <label for="pin-input" id="pin-label">Your 6-digit PIN</label>
+      <input id="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="6 numbers">
+      <div id="pin-confirm-wrap" hidden>
+        <label for="pin-confirm">Type your new PIN once more</label>
+        <input id="pin-confirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="Same 6 numbers">
+      </div>
+      <button class="ms-signin" id="pin-submit" type="button">Sign in</button>
+      <button class="text-button" id="not-me" type="button">← That's not me</button>
+      <p class="privacy-note" id="pin-note">Forgot your PIN? Ask Mrs. Baker — she can reset it in class.</p>
+    </div>
+  </div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="period-display" id="period-display" hidden></p><a class="teacher-link" id="teacher-link" href="/teacher" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=5"></script><script src="app.js?v=11"></script>
 </body>
 </html>

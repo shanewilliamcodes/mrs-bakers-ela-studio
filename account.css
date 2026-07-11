@@ -25,3 +25,21 @@
 .period-display{text-align:center}
 .text-button{border:0;background:none;color:var(--deep);padding:13px;width:100%;cursor:pointer;font-weight:700}
 .teacher-link{margin-top:10px;background:var(--pink)}
+
+/* Class-code sign-in steps */
+.signin-step .step-label{font-weight:700;margin:16px 0 8px}
+.period-choices{display:flex;flex-wrap:wrap;gap:8px}
+.period-choices button{flex:1 1 30%;min-height:46px;border:2px solid var(--line);border-radius:12px;background:#fff;font:inherit;font-weight:700;cursor:pointer}
+.period-choices button.active{border-color:var(--deep);background:var(--blush)}
+.name-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;max-height:260px;overflow-y:auto;margin-top:4px}
+.name-grid button{min-height:46px;border:2px solid var(--line);border-radius:12px;background:#fff;font:inherit;font-weight:600;cursor:pointer;padding:8px}
+.name-grid button:hover{border-color:var(--pink);background:var(--blush)}
+.pin-who{font:700 1.4rem Fraunces,serif;margin:6px 0 2px;color:var(--deep)}
+#pin-input,#pin-confirm{display:block;width:100%;box-sizing:border-box;padding:13px;border:1px solid var(--line);border-radius:10px;background:#fff;font:700 1.3rem inherit;letter-spacing:.35em;text-align:center;margin-bottom:10px}
+#pin-input:focus,#pin-confirm:focus{outline:3px solid #f3a9c3;outline-offset:2px}
+.signin-step label{display:block;font-weight:700;margin:14px 0 7px}
+.signin-step input{font-family:inherit}
+#class-code{display:block;width:100%;box-sizing:border-box;padding:13px;border:1px solid var(--line);border-radius:10px;background:#fff;font:700 1.2rem inherit;letter-spacing:.25em;text-transform:uppercase;text-align:center;margin-bottom:10px}
+#class-code:focus{outline:3px solid #f3a9c3;outline-offset:2px}
+.teacher-entry{display:block;text-align:center;text-decoration:none;font-size:.85rem;margin-top:14px}
+.period-display{text-align:center;color:var(--muted);font-weight:700;margin:0 0 10px}

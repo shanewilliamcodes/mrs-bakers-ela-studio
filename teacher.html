@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="teacher.css?v=5">
+  <link rel="stylesheet" href="teacher.css?v=6">
 </head>
 <body>
   <header>
@@ -99,10 +99,23 @@
             <ol id="leaderboard-admin-list"></ol>
           </section>
 
-          <section class="roster-admin">
-            <h2>Roster quick fixes</h2>
-            <p>Use this when a student picked the wrong period or their school account name needs cleanup.</p>
-            <div id="roster-list"></div>
+          <section class="class-code-admin">
+            <h2>Class code</h2>
+            <div class="code-row"><b id="class-code-value">------</b><button id="project-code" type="button">Project on board</button><button id="copy-join-link" type="button">Copy join link</button><button id="regen-code" type="button">New code</button></div>
+            <p>Students go to the class site → <b>Student sign in</b> → type this code (or open the join link), tap their name, and make up a 6-digit PIN. After the first time, their device remembers them.</p>
+            <span id="code-status" role="status"></span>
+          </section>
+
+          <section class="roster-editor">
+            <h2>Class roster</h2>
+            <p>Add students by name — first name and last initial are all the site ever shows or stores.</p>
+            <div class="add-row">
+              <label>Period<select id="add-period"><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select></label>
+              <label>Students (one per line, "First Last")<textarea id="add-names" rows="4" placeholder="Ava Rivera&#10;Mason Chen"></textarea></label>
+              <button id="add-students" type="button">Add to roster</button>
+              <span id="roster-status" role="status"></span>
+            </div>
+            <div id="roster-entries"></div>
           </section>
         </div>
       </section>
@@ -110,6 +123,6 @@
   </main>
 
   <script src="firebase-config.js"></script>
-  <script type="module" src="teacher.js?v=5"></script>
+  <script type="module" src="teacher.js?v=6"></script>
 </body>
 </html>
