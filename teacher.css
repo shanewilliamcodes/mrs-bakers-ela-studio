@@ -16,6 +16,8 @@ h1,h2,h3{font-family:Fraunces,serif}
 h1{font-size:clamp(38px,5vw,66px);line-height:1;margin:10px 0 24px;max-width:920px}
 #auth-box{background:#fff;padding:18px;max-width:720px;display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px}
 #auth-box p{margin:0;flex:1;color:var(--muted)}
+#auth-box label{font-weight:700}
+#auth-box input{min-height:44px;padding:8px 11px;border:1px solid var(--line);border-radius:7px;font:inherit}
 #demo-dashboard,.controls button:last-child{background:var(--rose)}
 #teacher-status{color:var(--berry);font-size:13px;font-weight:700}
 .dash-tabs{position:sticky;top:0;z-index:4;background:rgba(251,248,244,.96);border-bottom:1px solid var(--line);padding:12px 8vw;display:flex;gap:8px}

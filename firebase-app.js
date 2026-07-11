@@ -1,18 +1,18 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {browserLocalPersistence,getAuth,getRedirectResult,OAuthProvider,onAuthStateChanged,setPersistence,signInWithPopup,signInWithRedirect,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {browserLocalPersistence,getAuth,isSignInWithEmailLink,onAuthStateChanged,sendSignInLinkToEmail,setPersistence,signInWithEmailLink,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {addDoc,collection,doc,getDoc,getDocs,getFirestore,limit,orderBy,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-// Set MS_TENANT to the district's Entra tenant ID once known to lock sign-in
-// to district accounts and make silent SSO more likely. Empty = any Microsoft org.
-const MS_TENANT='';
-const MS_DOMAIN_HINT='';
+const SCHOOL_DOMAIN='@manateeschools.net';
+const TEACHER_EMAIL='bakert4@manateeschools.net';
+const EMAIL_STORAGE_KEY='bakerSignInEmail';
 const config=window.BAKER_FIREBASE_CONFIG;
 const button=document.querySelector('#account-button');
 const dialog=document.querySelector('#account-dialog');
 const feedback=document.querySelector('#account-feedback');
 const signedOut=document.querySelector('#account-state');
 const signedIn=document.querySelector('#signed-in-state');
-const signinButton=document.querySelector('#ms-signin');
+const signinButton=document.querySelector('#email-signin');
+const emailInput=document.querySelector('#school-email');
 const publish=detail=>window.dispatchEvent(new CustomEvent('baker-auth-change',{detail}));
 function normalizeName(raw){
   let name=String(raw||'Student').replace(/\s*[\[(].*?[\])]\s*/g,' ').replace(/\s+/g,' ').trim()||'Student';
@@ -33,41 +33,42 @@ if(!config?.projectId){
   const app=initializeApp(config);
   const auth=getAuth(app);
   const db=getFirestore(app);
-  const provider=new OAuthProvider('microsoft.com');
-  provider.setCustomParameters({
-    prompt:'select_account',
-    ...(MS_TENANT?{tenant:MS_TENANT}:{}),
-    ...(MS_DOMAIN_HINT?{domain_hint:MS_DOMAIN_HINT}:{})
-  });
   setPersistence(auth,browserLocalPersistence).catch(()=>{});
 
-  const authText=error=>`${error?.code||''} ${error?.message||''} ${JSON.stringify(error?.customData||{})}`;
   const authMessage=error=>{
-    const text=authText(error);
-    if(/AADSTS(65001|650052|900941)/.test(text))return "Your school district hasn't approved this website for student sign-in yet. Please tell Mrs. Baker — this is a district setting, not a mistake you made.";
-    if(/AADSTS50020/.test(text))return "That Microsoft account isn't part of the school district. Use your school email account.";
-    if(error?.code==='auth/popup-closed-by-user')return 'The Microsoft sign-in window closed before it finished. Click Sign in to try again, or tell Mrs. Baker if the window showed an error.';
-    if(error?.code==='auth/account-exists-with-different-credential')return 'This email was already used with a different sign-in method. Tell Mrs. Baker so she can fix your account.';
-    if(error?.code==='auth/admin-restricted-operation'||error?.code==='auth/user-disabled')return 'Your school may not allow this account to sign in to outside websites. Please ask Mrs. Baker — she can check with the district.';
+    if(error?.code==='auth/invalid-action-code'||error?.code==='auth/expired-action-code')return 'That sign-in link has expired or was already used. Request a new one below.';
+    if(error?.code==='auth/invalid-email')return 'Enter your full school email address.';
     if(error?.code==='auth/unauthorized-domain')return 'This website address still needs to be approved in Firebase. Please tell Mrs. Baker the sign-in domain is not authorized.';
-    if(error?.code==='auth/operation-not-allowed')return 'Microsoft sign-in has not been enabled for this class yet.';
-    if(error?.code==='auth/network-request-failed')return 'The network blocked school account sign-in. Check the connection and try again.';
+    if(error?.code==='auth/operation-not-allowed')return 'Email sign-in has not been enabled for this class yet.';
+    if(error?.code==='auth/network-request-failed')return 'The sign-in request could not reach the network. Check the connection and try again.';
     return `School account sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}. Please try once more, or tell Mrs. Baker if it keeps happening.`;
   };
 
-  getRedirectResult(auth).catch(error=>{feedback.textContent=authMessage(error)});
+  const validSchoolEmail=value=>String(value||'').trim().toLowerCase().endsWith(SCHOOL_DOMAIN);
   signinButton.addEventListener('click',async()=>{
-    feedback.textContent='Opening school account sign-in...';
+    const email=emailInput.value.trim().toLowerCase();
+    if(!validSchoolEmail(email)){feedback.textContent='Use your full @manateeschools.net school email.';emailInput.focus();return}
+    feedback.textContent='Sending your private sign-in link...';
     try{
       await setPersistence(auth,browserLocalPersistence);
-      await signInWithPopup(auth,provider);
+      await sendSignInLinkToEmail(auth,email,{url:`${location.origin}${location.pathname}${location.hash}`,handleCodeInApp:true});
+      localStorage.setItem(EMAIL_STORAGE_KEY,email);
+      feedback.textContent='Link sent! Open Outlook and click the email from Mrs. Baker’s Classroom.';
     }catch(error){
-      if(['auth/popup-blocked','auth/cancelled-popup-request'].includes(error?.code)){
-        feedback.textContent='The browser blocked the sign-in window. Switching to full-page sign-in...';
-        try{await signInWithRedirect(auth,provider)}catch(redirectError){feedback.textContent=authMessage(redirectError)}
-      }else feedback.textContent=authMessage(error);
+      feedback.textContent=authMessage(error);
     }
   });
+  if(isSignInWithEmailLink(auth,location.href)){
+    dialog.showModal();
+    feedback.textContent='Finishing your school account sign-in...';
+    const email=localStorage.getItem(EMAIL_STORAGE_KEY)||'';
+    if(email){
+      signInWithEmailLink(auth,email,location.href).then(()=>{
+        localStorage.removeItem(EMAIL_STORAGE_KEY);
+        history.replaceState(null,'',location.pathname+location.hash);
+      }).catch(error=>{feedback.textContent=authMessage(error)});
+    }else feedback.textContent='Enter the same school email you used, then request a fresh sign-in link.';
+  }
   document.querySelector('#sign-out').addEventListener('click',()=>signOut(auth));
   let currentUser=null,currentRole='student',currentPeriod=null;
   const periodSetup=document.querySelector('#period-setup'),periodDisplay=document.querySelector('#period-display');
@@ -102,18 +103,20 @@ if(!config?.projectId){
     document.querySelector('#profile-email').textContent=user.email||'';
     document.querySelector('#profile-initial').textContent=displayName[0].toUpperCase();
 
-    // Unlock the page as soon as Microsoft sign-in succeeds. Reading/creating
+    // Unlock the page as soon as email-link sign-in succeeds. Reading/creating
     // the Firestore profile is best-effort so a rules hiccup never blocks practice.
-    let role='student',period=null;
+    let role=user.email?.toLowerCase()===TEACHER_EMAIL?'teacher':'student',period=null;
     try{
       const profileSnap=await getDoc(doc(db,'users',user.uid));
       if(profileSnap.exists()){
         const profile=profileSnap.data();
-        role=profile?.role||'student';
+        role=profile?.role||role;
         period=profile?.period||null;
-        if(profile?.displayName!==displayName)await setDoc(doc(db,'users',user.uid),{displayName,email:user.email||'',updatedAt:serverTimestamp()},{merge:true});
+        const desiredRole=user.email?.toLowerCase()===TEACHER_EMAIL?'teacher':role;
+        if(profile?.displayName!==displayName||profile?.role!==desiredRole)await setDoc(doc(db,'users',user.uid),{displayName,email:user.email||'',role:desiredRole,updatedAt:serverTimestamp()},{merge:true});
+        role=desiredRole;
       }else{
-        await setDoc(doc(db,'users',user.uid),{displayName,email:user.email||'',role:'student',updatedAt:serverTimestamp()});
+        await setDoc(doc(db,'users',user.uid),{displayName,email:user.email||'',role,updatedAt:serverTimestamp()});
       }
     }catch(error){
       console.warn('Profile sync deferred (sign-in still succeeded):',error?.code||error);

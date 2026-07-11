@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="teacher.css?v=4">
+  <link rel="stylesheet" href="teacher.css?v=5">
 </head>
 <body>
   <header>
@@ -24,8 +24,10 @@
       <p>Grade 6 ELA · Private teacher view</p>
       <h1>Who did it, who didn't, who needs me?</h1>
       <div id="auth-box">
-        <p>Sign in with Mrs. Baker's approved school Microsoft account.</p>
-        <button id="teacher-signin">Teacher sign in</button>
+        <p>Enter Mrs. Baker's school email and open the private link sent to Outlook.</p>
+        <label for="teacher-email">School email</label>
+        <input id="teacher-email" type="email" autocomplete="email" value="bakert4@manateeschools.net">
+        <button id="teacher-signin">Email sign-in link</button>
         <button id="demo-dashboard" type="button">Preview with sample submissions</button>
       </div>
       <p id="teacher-status" role="status"></p>
@@ -108,6 +110,6 @@
   </main>
 
   <script src="firebase-config.js"></script>
-  <script type="module" src="teacher.js?v=4"></script>
+  <script type="module" src="teacher.js?v=5"></script>
 </body>
 </html>

@@ -1,10 +1,12 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,OAuthProvider,onAuthStateChanged,signInWithPopup,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import {getAuth,isSignInWithEmailLink,onAuthStateChanged,sendSignInLinkToEmail,signInWithEmailLink,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import {collection,deleteDoc,doc,getDoc,getDocs,getFirestore,limit,orderBy,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const config=window.BAKER_FIREBASE_CONFIG;
 const status=document.querySelector('#teacher-status');
 const content=document.querySelector('#dashboard-content');
+const teacherEmail='bakert4@manateeschools.net';
+const emailStorageKey='bakerSignInEmail';
 const todayKey=()=>new Date().toLocaleDateString('en-CA');
 const state={demo:false,teacher:null,roster:[],rows:[],weekRows:[],leaderboard:[],selectedUid:null};
 let db,auth;
@@ -35,21 +37,37 @@ if(!config?.projectId){
   const app=initializeApp(config);
   auth=getAuth(app);
   db=getFirestore(app);
-  const provider=new OAuthProvider('microsoft.com');
-  provider.setCustomParameters({prompt:'select_account'});
   document.querySelector('#teacher-signin').addEventListener('click',async()=>{
-    status.textContent='Opening school account sign-in...';
-    try{await signInWithPopup(auth,provider)}catch(error){status.textContent=authMessage(error)}
+    const email=document.querySelector('#teacher-email').value.trim().toLowerCase();
+    if(email!==teacherEmail){status.textContent="Use Mrs. Baker's approved school email.";return}
+    status.textContent='Sending a private sign-in link to Outlook...';
+    try{
+      await sendSignInLinkToEmail(auth,email,{url:`${location.origin}/teacher`,handleCodeInApp:true});
+      localStorage.setItem(emailStorageKey,email);
+      status.textContent='Link sent. Open the email in Outlook to finish signing in.';
+    }catch(error){status.textContent=authMessage(error)}
   });
+  if(isSignInWithEmailLink(auth,location.href)){
+    const email=localStorage.getItem(emailStorageKey)||teacherEmail;
+    status.textContent='Finishing teacher sign-in...';
+    signInWithEmailLink(auth,email,location.href).then(()=>{
+      localStorage.removeItem(emailStorageKey);
+      history.replaceState(null,'','/teacher');
+    }).catch(error=>{status.textContent=authMessage(error)});
+  }
   document.querySelector('#teacher-signout').addEventListener('click',()=>signOut(auth));
   onAuthStateChanged(auth,async user=>{
     if(!user){content.hidden=true;document.querySelector('#auth-box').hidden=false;document.querySelector('#teacher-signout').hidden=true;return}
     state.demo=false;
     state.teacher={uid:user.uid,displayName:normalizeName(user.displayName||user.email||'Teacher')};
     try{
-      const profile=await getDoc(doc(db,'users',user.uid));
+      let profile=await getDoc(doc(db,'users',user.uid));
+      if(profile.data()?.role!=='teacher'&&user.email?.toLowerCase()===teacherEmail){
+        await setDoc(doc(db,'users',user.uid),{displayName:state.teacher.displayName,email:user.email,role:'teacher',updatedAt:serverTimestamp()},{merge:true});
+        profile=await getDoc(doc(db,'users',user.uid));
+      }
       if(profile.data()?.role!=='teacher'){
-        status.textContent='This account is not approved as a teacher account yet. After Mrs. Baker signs in once, set this user document role to teacher in Firestore.';
+        status.textContent='This account is not approved as the teacher account.';
         await signOut(auth);
         return;
       }
@@ -80,11 +98,9 @@ document.querySelector('#demo-dashboard').addEventListener('click',()=>{
 });
 
 function authMessage(error){
-  const text=`${error?.code||''} ${error?.message||''} ${JSON.stringify(error?.customData||{})}`;
-  if(/AADSTS(65001|650052|900941)/.test(text))return "The district has not approved this website for Microsoft sign-in yet. That is an Entra/Firebase console setting.";
-  if(error?.code==='auth/popup-closed-by-user')return 'The Microsoft sign-in window closed before it finished.';
+  if(error?.code==='auth/invalid-action-code'||error?.code==='auth/expired-action-code')return 'That email link has expired or was already used. Request a new one.';
   if(error?.code==='auth/unauthorized-domain')return 'This Vercel domain still needs to be added to Firebase authorized domains.';
-  if(error?.code==='auth/operation-not-allowed')return 'Microsoft sign-in has not been enabled in Firebase yet.';
+  if(error?.code==='auth/operation-not-allowed')return 'Email sign-in has not been enabled in Firebase yet.';
   return `Teacher sign-in could not finish${error?.code?` (${error.code.replace('auth/','')})`:''}.`;
 }
 
@@ -115,7 +131,7 @@ async function loadData(){
     renderAll();
     status.textContent=`Loaded ${state.rows.length} submission${state.rows.length===1?'':'s'} for ${date}.`;
   }catch(error){
-    status.textContent='Could not load the dashboard. Check the network, Microsoft sign-in, and Firestore rules.';
+    status.textContent='Could not load the dashboard. Check the network, sign-in, and Firestore rules.';
   }
 }
 

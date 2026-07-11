@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css?v=2">
-  <link rel="stylesheet" href="account.css?v=5">
+  <link rel="stylesheet" href="account.css?v=6">
   <link rel="stylesheet" href="leaderboard.css?v=2">
   <link rel="stylesheet" href="analytics.css?v=3">
   <link rel="stylesheet" href="bellwork.css?v=3">
@@ -60,7 +60,7 @@
     <section class="view" id="view-bellwork">
       <div class="page-heading"><button data-view="home">← Launchpad</button><p class="eyebrow">Today's work</p><h1>Bell Work</h1><p>A new B.E.S.T.-aligned thinking routine every school day.</p></div>
       <div class="auth-gate" id="bellwork-gate">
-        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Sign in with your school account</button><small>Use your school Microsoft account.</small>
+        <span class="lock">✓</span><h2>Sign in before you begin</h2><p>Bell work is connected to your account so Mrs. Baker can see who completed it and give useful feedback.</p><button id="bellwork-signin">Sign in with your school email</button><small>Your private link arrives in Outlook.</small>
       </div>
       <article class="bell-workspace" id="bellwork-workspace" hidden>
         <div class="bell-header"><div><span id="bell-day-type">Monday · Make a Claim</span><h2 id="bell-prompt">Loading today's prompt...</h2></div><div><small id="bell-date"></small><b id="bell-label"></b></div></div>
@@ -136,7 +136,7 @@
     </section>
   </main>
 
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2>Sign in to your class account</h2><p>One click with your school Microsoft account — no password to remember here. Your account works for bell work and the FAST Streak Spotlight.</p><div class="account-state" id="account-state"><button class="ms-signin" id="ms-signin" type="button">Sign in with your school account</button><p class="privacy-note">No separate password or class code needed.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><div class="period-setup" id="period-setup" hidden><label for="period-select">Which class period are you in?</label><select id="period-select"><option value="">Choose your period</option><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select><button id="save-period" type="button">Save my period</button></div><button class="text-button period-display" id="period-display" type="button" hidden></button><a class="teacher-link" id="teacher-link" href="/teacher" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=3"></script><script src="app.js?v=9"></script>
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2>Sign in to your class account</h2><p>Enter your school email. We will send a private sign-in link to your Outlook inbox, so there is no new password to remember.</p><div class="account-state" id="account-state"><label for="school-email">School email</label><input id="school-email" type="email" autocomplete="email" placeholder="name@manateeschools.net"><button class="ms-signin" id="email-signin" type="button">Email me a sign-in link</button><p class="privacy-note">Open the link on this computer to finish signing in.</p></div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><div class="period-setup" id="period-setup" hidden><label for="period-select">Which class period are you in?</label><select id="period-select"><option value="">Choose your period</option><option value="1">Period 1</option><option value="2">Period 2</option><option value="3">Period 3</option><option value="4">Period 4</option><option value="5">Period 5</option><option value="6">Period 6</option></select><button id="save-period" type="button">Save my period</button></div><button class="text-button period-display" id="period-display" type="button" hidden></button><a class="teacher-link" id="teacher-link" href="/teacher" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=4"></script><script src="app.js?v=10"></script>
 </body>
 </html>

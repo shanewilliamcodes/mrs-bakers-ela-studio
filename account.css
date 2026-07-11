@@ -9,6 +9,9 @@
 .ms-signin:hover,.signed-in-state>button:not(.text-button):hover{background:#5c1e38}
 .ms-signin:focus-visible{outline:3px solid #f3a9c3;outline-offset:3px}
 .ms-signin:disabled{opacity:.5;cursor:not-allowed}
+.account-state label{display:block;font-weight:700;margin:18px 0 7px}
+.account-state input{display:block;width:100%;box-sizing:border-box;padding:13px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;margin-bottom:10px}
+.account-state input:focus{outline:3px solid #f3a9c3;outline-offset:2px}
 .privacy-note,.account-feedback{font-size:.8rem;color:var(--muted)}
 .profile-row{display:flex;align-items:center;gap:12px;margin:20px 0}
 .profile-row>span{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--pink);color:#fff;font:700 18px Fraunces,serif}

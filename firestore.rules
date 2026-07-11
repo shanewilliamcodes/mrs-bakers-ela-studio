@@ -3,15 +3,21 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function isTeacherEmail() {
+      return signedIn() && request.auth.token.email == 'bakert4@manateeschools.net';
+    }
     function isTeacher() {
       return signedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
     }
     match /users/{uid} {
-      allow create: if isOwner(uid) && request.resource.data.role == 'student';
+      allow create: if isOwner(uid) && (request.resource.data.role == 'student'
+        || (isTeacherEmail() && request.resource.data.role == 'teacher'));
       allow read: if isOwner(uid) || isTeacher();
-      allow update: if (isOwner(uid) && request.resource.data.role == resource.data.role) || isTeacher();
+      allow update: if (isOwner(uid) && request.resource.data.role == resource.data.role)
+        || (isOwner(uid) && isTeacherEmail() && request.resource.data.role == 'teacher')
+        || isTeacher();
     }
     match /bellwork/{submissionId} {
       allow create: if signedIn()

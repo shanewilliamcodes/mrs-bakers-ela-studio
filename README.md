@@ -5,7 +5,7 @@ Public Grade 6 ELA classroom hub for Mrs. Tori Baker at Lake Manatee K-8
 
 **https://mrs-bakers-classroom.vercel.app/**
 
-Static site on Vercel + Firebase (Microsoft school-account sign-in, Cloud
+Static site on Vercel + Firebase (school email-link sign-in, Cloud
 Firestore). No build step — edit, commit, push to `main`, and Vercel deploys.
 
 ## What's on the site
@@ -38,8 +38,8 @@ Key features:
 
 - `firebase-config.js` is intentionally public (Firebase web keys are not
   secrets); all security lives in `firestore.rules`.
-- `authDomain` is the Vercel domain. `vercel.json` proxies `/__/auth/*` to the
-  Firebase project so Microsoft redirect sign-in stays same-origin.
+- `authDomain` is the Vercel domain. Students receive passwordless Firebase
+  sign-in links at their `@manateeschools.net` Outlook address.
 - `firestore.rules` in this repo is the source of truth, but it is **not**
   auto-deployed: after changing it, paste it into Firebase Console →
   Firestore → Rules → Publish (project `mrs-baker-s-ela-studio`) or run
@@ -58,16 +58,15 @@ Key features:
 1. Vercel project `mrs-bakers-classroom`, framework preset Other, no build
    command, output directory = repo root.
 2. Firebase Auth authorized domain: `mrs-bakers-classroom.vercel.app`.
-3. Microsoft provider enabled in Firebase Auth using an Entra app registration
-   with redirect URI `https://mrs-bakers-classroom.vercel.app/__/auth/handler`.
+3. Email/Password provider enabled in Firebase Auth with Email link sign-in
+   turned on. Password sign-in is not exposed by the website.
 4. `firestore.rules` published via Firebase Console or Firebase CLI.
-5. Teacher account: Mrs. Baker signs in once with her district Microsoft
-   account, then set `users/{uid}.role` to `teacher` in Firestore.
+5. Mrs. Baker's approved school email is allowlisted in `firestore.rules`; its
+   user profile is promoted to `role: teacher` automatically at first sign-in.
 
 ## Open items
 
-- Verify a real Manatee County student Microsoft account can sign in. If the
-  district blocks app consent, fallback is class-code + name-picker accounts.
+- Verify that Manatee County student mailboxes receive Firebase sign-in emails.
 - Replace syllabus placeholders once school/district policies are confirmed.
 - Replace 2025 district FAST context with Lake Manatee's own baseline after
   the 2026-27 results arrive.
