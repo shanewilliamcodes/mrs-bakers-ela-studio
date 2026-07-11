@@ -110,6 +110,8 @@ This forwards old bookmarks (including `#bellwork` deep links) and is inert on V
 
 ## Phase 3 — Auth overhaul: Microsoft/Outlook SSO
 
+> **SUPERSEDED (2026-07-10).** The email-link student sign-in shipped on 07-08 is rejected — too much friction for 11-year-olds, and the delivery test landed in Junk. Build **Phase 3R** below instead. This section stays only as background for the SSO *upgrade* track.
+
 Goal: a student on a school computer (already signed into their district Microsoft 365 account in the browser) clicks **Sign in** → Microsoft account picker shows their account already listed (or silently signs in on domain-joined Edge) → one click → done. No passwords typed on our site, ever.
 
 **3.1 `firebase-app.js` — provider swap.**
@@ -214,3 +216,84 @@ Ordered by impact:
 ---
 
 *Prepared by Fable (planning). Implementation: Codex. Manual console steps: Shane (Phase 0).*
+
+---
+
+# REVISION 2026-07-10 — Student sign-in v3 (Phase 3R) — THIS OVERRIDES PHASE 3
+
+## What happened & the correction
+
+- The email-link flow (commit `37078c2`) is **rejected**: type email → wait for delivery → find it in Junk → click link is far too much friction for Grade 6, and Outlook junked the very first message. District mail filters may block student-facing external mail entirely. **Remove the student email-link UI.**
+- Codex's conclusion "true Outlook SSO is impossible without district IT" was **premature**. The blocker it hit was trying to register the app *inside the district's Entra directory*. The plan never required that: a **multitenant** app registered in **our own free tenant** works for sign-in by accounts from *any* org, including the district. The only district-controlled gate is whether its users may **consent** to third-party apps — unknown until tested, and fixable by one admin-consent request to district IT.
+- So we run two tracks: **Track 1 (build now, Codex)** — class-code + name-picker + PIN sign-in: zero district dependency, lowest real-world friction. **Track 2 (parallel, Shane)** — own-tenant Entra app + consent test; if it passes, the SSO button from old Phase 3 gets added *on top* later and becomes the primary path.
+
+## Track 1 — Class-code sign-in (Codex builds this now)
+
+### Student experience (the whole point — keep it this simple)
+
+- **First time (once per student, ~30s):** open site → Sign in → enter the class code Mrs. Baker projects on the board (or arrive via QR/link `/?code=XXXXXX`, which skips typing) → tap your class period → tap your own name → make up a 6-digit PIN (enter it twice) → done.
+- **Every time after:** the account stays signed in on their device (`browserLocalPersistence`), so normally **zero clicks**. If signed out: Sign in → your name is remembered on the device (or tap it) → type PIN → in.
+- **Forgot PIN:** "Ask Mrs. Baker" — she resets it from the dashboard in one click.
+- No email. No inbox. No passwords beyond a 6-digit PIN. Works on any device, any browser, no district approval.
+
+### Mechanics
+
+**Auth backend:** Firebase **Email/Password** provider (Shane enables it in Firebase Console → Authentication → Sign-in method; disable the Email-link option at the same time — password-only variant). Each roster entry maps to a synthetic address the student never sees:
+`s-{entryId}@mrs-bakers-classroom.vercel.app` — a domain we control with no MX, so nobody else can ever receive mail for it (do NOT use a real-looking domain someone could register). Password = the 6-digit PIN (meets Firebase's 6-char minimum).
+
+**Roster data model:** one doc per class code: `rosters/{classCode}` →
+`{ teacherUid, updatedAt, students: [{ id, first, lastInitial, period }] }`
+- `classCode`: 6 chars, unambiguous alphabet (no 0/O/1/I), generated in the dashboard.
+- The code is a *capability*: Firestore rules allow `get` (never `list`) on `rosters`, so knowing the code is what unlocks the name picker. First name + last initial only — same exposure level as the existing public leaderboard.
+- Students never write the roster. "Claimed" needs no roster field: a second claim of the same name fails `createUserWithEmailAndPassword` with `auth/email-already-in-use` → UI says "This name already has a PIN. If it's you, enter your PIN" and falls through to sign-in. Elegant and race-proof.
+
+**Client flow (`firebase-app.js` rewrite of the student dialog):**
+1. Dialog state 1 — class code input (prefilled from `?code=` param or `localStorage.bakerClassCode`; on success cache it and strip the param).
+2. State 2 — period buttons → name chips for that period (from the roster doc).
+3. State 3 — PIN pad (big touch-friendly digit buttons AND a plain `<input inputmode="numeric" maxlength="6">`; new students confirm twice). New → `createUserWithEmailAndPassword`; returning → `signInWithEmailAndPassword`.
+4. On first sign-in, create `users/{uid}` with `{displayName: "First L.", first, lastInitial, period, rosterId, classCode, role:'student'}` — **period comes from the roster now**, so DELETE the old self-serve period picker UI from the dialog (roster is the source of truth; teacher fixes mistakes in the dashboard).
+5. Remember `{entryId, first}` in localStorage so a returning signed-out student goes straight to the PIN step with a "Not you?" escape link.
+6. Error copy for kids: wrong PIN → "That PIN doesn't match. Try again, or ask Mrs. Baker to reset it." `auth/too-many-requests` → "Too many tries. Wait a few minutes or ask Mrs. Baker."
+7. Keep publishing the same `baker-auth-change` event shape — `app.js` consumers stay untouched except: `authState.period` now always comes from the profile, and `studentName` on submissions uses the roster name (kids can't set a custom display name → no moderation surface; the existing `normalizeName` stays for the teacher account only).
+
+**Teacher sign-in stays email-link** (already built, already verified reaching her inbox; she's one adult who does this once per device). Keep the `TEACHER_EMAIL` recognition and the teacher email-link path in `teacher.html`/`firebase-app.js` — just remove it from the *student* dialog. Move any `isSignInWithEmailLink` completion handling so it still works on both pages.
+
+**PIN reset (the one serverless function this project now needs):**
+- `api/reset-pin.js` (Vercel Node function — the repo stays otherwise static; Vercel serves `api/` alongside it).
+- Request: `POST {idToken, entryId, newPin}`. Verify `idToken` with Firebase Admin SDK → look up caller's `users/{uid}.role === 'teacher'` → `admin.auth().updateUser(uidByEmail('s-{entryId}@…'), {password: newPin})`. Return 403 otherwise.
+- Also support `{action:'unclaim'}` → delete the auth user (student re-registers fresh) for name-claimed-by-wrong-kid cases.
+- Secrets: `FIREBASE_SERVICE_ACCOUNT` env var in Vercel (Shane pastes the service-account JSON from Firebase Console → Project settings → Service accounts). Add `firebase-admin` via a minimal `package.json` — Vercel installs it for functions only; the static site is unaffected.
+
+**Dashboard additions (Class setup tab):**
+- Roster editor: paste names ("First Last", one per line, per period) → stored as first + last initial; add/remove single students; drag/move between periods not needed (edit period inline).
+- Show class code big + printable QR (generate QR client-side, e.g. tiny embedded qr library or canvas impl — no external CDN at runtime beyond what's already used).
+- Per-student row: claimed ✓ / not-yet ▫, **Reset PIN** button (prompts for new 6-digit, calls `api/reset-pin`), **Unclaim** button.
+- "Regenerate class code" button (writes a new roster doc id, deletes old) for if the code leaks beyond the class.
+
+**Firestore rules changes:**
+```
+match /rosters/{code} {
+  allow get: if true;        // capability = knowing the code; never allow list
+  allow list: if false;
+  allow write: if isTeacher();
+}
+```
+`users/{uid}` create rule: student self-create stays, but now validate `request.resource.data.role == 'student'` (unchanged) — plus keep the existing teacher-email carve-out. Everything else stands. **Remind Shane: publish rules after merge (console paste or `firebase deploy --only firestore:rules`).**
+
+**Cleanup in the same pass:** remove the student email-input UI, `SCHOOL_DOMAIN` student validation, "link sent" copy, and any "check Outlook" strings; update both auth gates (`updateGate()` text → "Sign in with your class code"); bump `?v=` on all touched JS/CSS.
+
+**Acceptance test (run on the live Vercel URL):**
+1. Teacher: build a 3-name roster in two periods, get the code.
+2. Fresh incognito: enter code → pick period → pick name → set PIN → submit bell work. Close browser, reopen → still signed in.
+3. Second incognito claims the same name → gets the "already has a PIN" path; correct PIN signs in, wrong PIN shows kid-friendly error.
+4. Teacher resets that PIN from dashboard → old PIN fails, new PIN works. Unclaim → name is claimable fresh.
+5. `/?code=XXXXXX` link skips the code screen. Leaderboard + teacher board show roster names ("First L.").
+
+## Track 2 — Real Outlook SSO (Shane, parallel; NOT Codex)
+
+1. Create a free Azure account at azure.microsoft.com/free with the personal Microsoft account (card required for identity verification only — nothing is billed; this is what creates your own Entra tenant, which is the step that was missing on 07-08).
+2. Register the multitenant app per original Phase 0.3 (redirect URI `https://mrs-bakers-classroom.vercel.app/__/auth/handler`), enable the Microsoft provider in Firebase per 0.4.
+3. **The 5-minute truth test:** on the live site (a temporary hidden `/sso-test.html` page Codex can add with one Microsoft-sign-in button), sign in with Mrs. Baker's district account.
+   - Signs in → district allows user consent → SSO is viable; schedule old-Phase-3 as the primary student path and demote class codes to fallback.
+   - "Need admin approval" (AADSTS65001/900941/650052) → send district IT this ask: *"Please grant tenant-wide admin consent for app `<client ID>` ('Mrs Baker's Classroom'), a teacher classroom website. It requests only sign-in scopes (openid, profile, email, User.Read) — no mailbox, files, or directory access. Alternatively we're happy to onboard via ClassLink if that's preferred."* Districts approve teacher tools like this routinely; timeline is the only unknown.
+4. Note: teacher consent working does NOT guarantee student consent (districts often have stricter minor policies) — before flipping SSO to primary, test with a real student account.
