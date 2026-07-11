@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>SSO Test (private)</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:640px;margin:3rem auto;padding:0 1rem;color:#222}
+  button{font-size:1.1rem;padding:.7rem 1.4rem;border-radius:8px;border:1px solid #742747;background:#742747;color:#fff;cursor:pointer}
+  button.alt{background:#fff;color:#742747;margin-left:.5rem}
+  pre{background:#f6f2f4;padding:1rem;border-radius:8px;white-space:pre-wrap;word-break:break-all}
+  .ok{color:#116b2f}.bad{color:#a3123a}
+</style>
+</head>
+<body>
+<h1>Microsoft SSO test</h1>
+<p>Private diagnostic page — not linked from the site. Click the button and sign in with a <b>district</b> Microsoft account to test whether Manatee County allows sign-in to this app.</p>
+<button id="go">Sign in with Microsoft (popup)</button>
+<button id="go-redirect" class="alt">Redirect flow</button>
+<h2 id="verdict"></h2>
+<pre id="out">Waiting…</pre>
+<script src="firebase-config.js"></script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getAuth,OAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+const app=initializeApp(window.BAKER_FIREBASE_CONFIG);
+const auth=getAuth(app);
+const out=document.querySelector('#out'),verdict=document.querySelector('#verdict');
+const provider=new OAuthProvider('microsoft.com');
+provider.setCustomParameters({prompt:'select_account'});
+function show(result){
+  const cred=OAuthProvider.credentialFromResult(result);
+  let tid='(unknown)';
+  try{tid=JSON.parse(atob(cred.idToken.split('.')[1])).tid||tid}catch(e){}
+  verdict.textContent='✅ SIGN-IN WORKED';verdict.className='ok';
+  out.textContent=JSON.stringify({
+    displayName:result.user.displayName,
+    email:result.user.email,
+    uid:result.user.uid,
+    tenantId_tid:tid,
+    note:'tid is the Entra tenant ID — use as MS_TENANT to lock sign-in to the district.'
+  },null,2);
+  signOut(auth);
+}
+function fail(error){
+  const aadsts=(String(error?.message).match(/AADSTS\d+/)||[])[0]||null;
+  verdict.textContent='❌ SIGN-IN FAILED';verdict.className='bad';
+  out.textContent=JSON.stringify({
+    code:error?.code||null,
+    AADSTS:aadsts,
+    hint:aadsts&&['AADSTS65001','AADSTS650052','AADSTS900941'].includes(aadsts)
+      ?'District blocks user consent → needs admin consent from district IT (see build packet Track 2 email).'
+      :aadsts==='AADSTS50020'?'Account is not in an allowed directory.':null,
+    message:error?.message||String(error),
+  },null,2);
+}
+document.querySelector('#go').addEventListener('click',()=>{out.textContent='Opening popup…';signInWithPopup(auth,provider).then(show).catch(fail)});
+document.querySelector('#go-redirect').addEventListener('click',()=>signInWithRedirect(auth,provider).catch(fail));
+getRedirectResult(auth).then(r=>{if(r)show(r)}).catch(fail);
+</script>
+</body>
+</html>
