@@ -297,3 +297,11 @@ match /rosters/{code} {
    - Signs in → district allows user consent → SSO is viable; schedule old-Phase-3 as the primary student path and demote class codes to fallback.
    - "Need admin approval" (AADSTS65001/900941/650052) → send district IT this ask: *"Please grant tenant-wide admin consent for app `<client ID>` ('Mrs Baker's Classroom'), a teacher classroom website. It requests only sign-in scopes (openid, profile, email, User.Read) — no mailbox, files, or directory access. Alternatively we're happy to onboard via ClassLink if that's preferred."* Districts approve teacher tools like this routinely; timeline is the only unknown.
 4. Note: teacher consent working does NOT guarantee student consent (districts often have stricter minor policies) — before flipping SSO to primary, test with a real student account.
+
+### Track 2 — TEST RESULT (2026-07-10, verified live)
+
+Entra app registered in Shane's own tenant: **Mrs Baker's Classroom**, client ID `b11a9fb1-93c7-4787-9917-20b17ba322e5`, multitenant (all tenants), Web redirect URIs = vercel + firebaseapp `/__/auth/handler`, secret expires 7/9/2028. Microsoft provider **enabled in Firebase** with these credentials. `/sso-test` page (redirect flow) with Mrs. Baker's district account produced:
+
+> **"Approval required — Mrs Baker's Classroom (unverified). This app requires your admin's approval to: Sign in and read user profile."** — with a working **"Request approval"** justification box.
+
+Meaning: the district blocks user consent (as suspected), but the **admin-consent request workflow is ENABLED** — Mrs. Baker can submit the request directly from that screen (no cold email needed). If district IT approves, SSO works with zero further code/config; retest at `/sso-test`. Until then, Phase 3R (class code + PIN) remains the launch plan. Justification text to paste when requesting: *"Free classroom website for Mrs. Baker's Grade 6 ELA classes at Lake Manatee K-8 — students sign in to submit daily bell work and practice reading skills. Sign-in only (openid, profile, email, User.Read); no mailbox, files, or directory access."*
