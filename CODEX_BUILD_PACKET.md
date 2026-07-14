@@ -305,3 +305,13 @@ Entra app registered in Shane's own tenant: **Mrs Baker's Classroom**, client ID
 > **"Approval required — Mrs Baker's Classroom (unverified). This app requires your admin's approval to: Sign in and read user profile."** — with a working **"Request approval"** justification box.
 
 Meaning: the district blocks user consent (as suspected), but the **admin-consent request workflow is ENABLED** — Mrs. Baker can submit the request directly from that screen (no cold email needed). If district IT approves, SSO works with zero further code/config; retest at `/sso-test`. Until then, Phase 3R (class code + PIN) remains the launch plan. Justification text to paste when requesting: *"Free classroom website for Mrs. Baker's Grade 6 ELA classes at Lake Manatee K-8 — students sign in to submit daily bell work and practice reading skills. Sign-in only (openid, profile, email, User.Read); no mailbox, files, or directory access."*
+
+---
+
+# STATUS 2026-07-11 — Phase 3R SHIPPED (built by Fable, not Codex)
+
+Live on mrs-bakers-classroom.vercel.app. Student email-link flow removed; class-code + name-picker + 6-digit PIN sign-in is the student path. Teacher keeps email-link. Dashboard gained: Class setup → class code (project-on-board fullscreen + copy join link `/?code=XXXXXX` + regenerate), roster editor (paste names per period; stores first name + last initial only; duplicate names auto-get longer initials), claimed/no-PIN status per student, Reset PIN, Remove. Completion board and week matrix are roster-aware (unclaimed students show "has not created a PIN yet").
+
+E2E-verified on prod with throwaway accounts (since deleted): roster create → code entry → name pick → PIN create → bell work submit → sign-out → remembered-student PIN re-entry → wrong-PIN error → teacher board reflects everything. Firestore rules v3 published (rosters get-only/claims collections + `email_verified` guard on the teacher-email carve-out — closes a role-takeover hole).
+
+**Open item:** `api/reset-pin.js` needs `FIREBASE_SERVICE_ACCOUNT` in Vercel env vars (service-account JSON from Firebase Console → Project settings → Service accounts). Until then the endpoint returns 501 and the dashboard offers the built-in "fresh start" fallback (student re-registers, streak resets). Also: Mrs. Baker's `users` doc `displayName` is her email (cosmetic); Google provider still enabled in Firebase but unused.
