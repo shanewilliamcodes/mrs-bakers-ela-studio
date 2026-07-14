@@ -5,6 +5,8 @@
 const admin = require('firebase-admin');
 
 const PIN_EMAIL_DOMAIN = 'mrs-bakers-classroom.vercel.app';
+// MUST match PIN_SUFFIX in firebase-app.js.
+const PIN_SUFFIX = '-mb';
 let initialized = false;
 
 function init() {
@@ -23,8 +25,8 @@ module.exports = async (req, res) => {
     if (typeof idToken !== 'string' || !/^[a-z0-9]{4,24}$/i.test(String(entryId || ''))) {
       return res.status(400).json({ error: 'bad-request' });
     }
-    if (action !== 'unclaim' && !/^\d{6}$/.test(String(newPin || ''))) {
-      return res.status(400).json({ error: 'pin-must-be-6-digits' });
+    if (action !== 'unclaim' && !/^\d{4}$/.test(String(newPin || ''))) {
+      return res.status(400).json({ error: 'pin-must-be-4-digits' });
     }
     const decoded = await admin.auth().verifyIdToken(idToken);
     const profile = await admin.firestore().doc(`users/${decoded.uid}`).get();
@@ -37,7 +39,7 @@ module.exports = async (req, res) => {
       await admin.firestore().doc(`claims/${entryId}`).delete().catch(() => {});
       return res.status(200).json({ ok: true, unclaimed: true });
     }
-    await admin.auth().updateUser(user.uid, { password: String(newPin) });
+    await admin.auth().updateUser(user.uid, { password: String(newPin) + PIN_SUFFIX });
     return res.status(200).json({ ok: true });
   } catch (error) {
     if (error?.code === 'auth/user-not-found') return res.status(404).json({ error: 'student-account-not-found' });

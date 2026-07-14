@@ -3,10 +3,14 @@ import {browserLocalPersistence,createUserWithEmailAndPassword,getAuth,onAuthSta
 import {addDoc,collection,doc,getDoc,getDocs,getFirestore,limit,orderBy,query,serverTimestamp,setDoc,where} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 // Class-code sign-in: students enter the class code, tap their name from the
-// roster, and use a 6-digit PIN. Behind the scenes each roster entry maps to a
+// roster, and use a 4-digit PIN. Behind the scenes each roster entry maps to a
 // Firebase email/password account with a synthetic address on a domain we own
 // (no MX records, so no one can ever receive mail for it).
 const PIN_EMAIL_DOMAIN='mrs-bakers-classroom.vercel.app';
+// Firebase passwords must be 6+ chars; students only ever see the 4 digits.
+// MUST match PIN_SUFFIX in api/reset-pin.js.
+const PIN_SUFFIX='-mb';
+const pinToPassword=pin=>pin+PIN_SUFFIX;
 const TEACHER_EMAIL='bakert4@manateeschools.net';
 const CODE_KEY='bakerClassCode';
 const STUDENT_KEY='bakerStudent';
@@ -102,25 +106,25 @@ if(!config?.projectId){
   function openPinStep(claimed){
     chosenClaimed=claimed;
     document.querySelector('#pin-who').textContent=`Hi, ${chosen.first}!`;
-    document.querySelector('#pin-label').textContent=claimed?'Type your 6-digit PIN':'Make up a secret 6-digit PIN';
+    document.querySelector('#pin-label').textContent=claimed?'Type your 4-digit PIN':'Make up a secret 4-digit PIN';
     pinConfirmWrap.hidden=claimed;
     document.querySelector('#pin-submit').textContent=claimed?'Sign in':'Create my PIN';
-    document.querySelector('#pin-note').textContent=claimed?'Forgot your PIN? Ask Mrs. Baker — she can reset it in class.':'Pick 6 numbers you will remember. Do not use your birthday if friends know it!';
+    document.querySelector('#pin-note').textContent=claimed?'Forgot your PIN? Ask Mrs. Baker — she can reset it in class.':'Pick 4 numbers you will remember. Do not use your birthday if friends know it!';
     pinInput.value='';pinConfirm.value='';
     showStep('pin');pinInput.focus();
   }
   async function submitPin(){
     const pin=pinInput.value.trim();
-    if(!/^\d{6}$/.test(pin)){feedback.textContent='Your PIN is exactly 6 numbers.';pinInput.focus();return}
-    if(!chosenClaimed&&pin!==pinConfirm.value.trim()){feedback.textContent='Those two PINs do not match — type the same 6 numbers in both boxes.';pinConfirm.focus();return}
+    if(!/^\d{4}$/.test(pin)){feedback.textContent='Your PIN is exactly 4 numbers.';pinInput.focus();return}
+    if(!chosenClaimed&&pin!==pinConfirm.value.trim()){feedback.textContent='Those two PINs do not match — type the same 4 numbers in both boxes.';pinConfirm.focus();return}
     feedback.textContent=chosenClaimed?'Signing you in...':'Creating your account...';
     document.querySelector('#pin-submit').disabled=true;
     try{
       if(chosenClaimed){
-        await signInWithEmailAndPassword(auth,entryEmail(chosen.id),pin);
+        await signInWithEmailAndPassword(auth,entryEmail(chosen.id),pinToPassword(pin));
       }else{
         pendingProfile={entryId:chosen.id,classCode:chosen.code||rosterCode,first:chosen.first,lastInitial:chosen.lastInitial,period:chosen.period};
-        const cred=await createUserWithEmailAndPassword(auth,entryEmail(chosen.id),pin);
+        const cred=await createUserWithEmailAndPassword(auth,entryEmail(chosen.id),pinToPassword(pin));
         await updateProfile(cred.user,{displayName:studentLabel(chosen)}).catch(()=>{});
         setDoc(doc(db,'claims',chosen.id),{uid:cred.user.uid,classCode:chosen.code||rosterCode,at:serverTimestamp()}).catch(()=>{});
       }
@@ -140,7 +144,7 @@ if(!config?.projectId){
   codeInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submitCode()}});
   codeInput.addEventListener('input',()=>{codeInput.value=cleanCode(codeInput.value)});
   [pinInput,pinConfirm].forEach(el=>{
-    el.addEventListener('input',()=>{el.value=el.value.replace(/\D/g,'').slice(0,6)});
+    el.addEventListener('input',()=>{el.value=el.value.replace(/\D/g,'').slice(0,4)});
     el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submitPin()}});
   });
   document.querySelector('#pin-submit').addEventListener('click',submitPin);

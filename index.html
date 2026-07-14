@@ -136,7 +136,7 @@
     </section>
   </main>
 
-  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2 id="account-title">Sign in to your class account</h2><p id="account-intro">No email, no long password — just your class code, your name, and your secret PIN.</p><div class="account-state" id="account-state">
+  <dialog class="account-dialog" id="account-dialog"><form method="dialog" class="account-panel"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">Mrs. Baker's Classroom</p><h2 id="account-title">Sign in to your class account</h2><p id="account-intro">No email, no long password — just your class code, your name, and your secret 4-number PIN.</p><div class="account-state" id="account-state">
     <div class="signin-step" id="step-code">
       <label for="class-code">Class code</label>
       <input id="class-code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="From the board, like BKR6ML">
@@ -154,17 +154,17 @@
     </div>
     <div class="signin-step" id="step-pin" hidden>
       <p class="pin-who" id="pin-who"></p>
-      <label for="pin-input" id="pin-label">Your 6-digit PIN</label>
-      <input id="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="6 numbers">
+      <label for="pin-input" id="pin-label">Your 4-digit PIN</label>
+      <input id="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="4 numbers">
       <div id="pin-confirm-wrap" hidden>
         <label for="pin-confirm">Type your new PIN once more</label>
-        <input id="pin-confirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="Same 6 numbers">
+        <input id="pin-confirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="Same 4 numbers">
       </div>
       <button class="ms-signin" id="pin-submit" type="button">Sign in</button>
       <button class="text-button" id="not-me" type="button">← That's not me</button>
       <p class="privacy-note" id="pin-note">Forgot your PIN? Ask Mrs. Baker — she can reset it in class.</p>
     </div>
   </div><div class="signed-in-state" id="signed-in-state" hidden><div class="profile-row"><span id="profile-initial">S</span><div><b id="profile-name">Student</b><small id="profile-email"></small></div></div><p class="period-display" id="period-display" hidden></p><a class="teacher-link" id="teacher-link" href="/teacher" hidden>Open teacher dashboard</a><button class="text-button" id="sign-out" type="button">Sign out</button></div><p class="account-feedback" id="account-feedback" role="status"></p></form></dialog>
-  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=5"></script><script src="app.js?v=11"></script>
+  <script src="firebase-config.js"></script><script type="module" src="firebase-app.js?v=6"></script><script src="app.js?v=11"></script>
 </body>
 </html>

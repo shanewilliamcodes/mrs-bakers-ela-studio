@@ -433,9 +433,9 @@ async function resetPin(entryId){
   const entry=state.entries.find(x=>x.id===entryId);
   if(!entry)return;
   if(state.demo){alert('Preview mode — sign in to reset a real PIN.');return}
-  const pin=prompt(`New 6-digit PIN for ${entry.first} ${entry.lastInitial}.`);
+  const pin=prompt(`New 4-digit PIN for ${entry.first} ${entry.lastInitial}.`);
   if(pin===null)return;
-  if(!/^\d{6}$/.test(pin.trim())){alert('The PIN must be exactly 6 numbers.');return}
+  if(!/^\d{4}$/.test(pin.trim())){alert('The PIN must be exactly 4 numbers.');return}
   try{
     const idToken=await auth.currentUser.getIdToken();
     const res=await fetch('/api/reset-pin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken,entryId,newPin:pin.trim()})});
